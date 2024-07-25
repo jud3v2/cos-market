@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services\Security;
+
 class JwtGenerator
 {
     private string $key;

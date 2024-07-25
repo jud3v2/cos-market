@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Services\Security\JwtGenerator;
 use App\Models\User;
+
+require '../services/security/JWTGenerator.php';
 
 class AuthController extends Controller
 {
@@ -27,7 +28,8 @@ class AuthController extends Controller
 
     public function login(Request $request): JsonResponse
     {
-        $isOk = auth()->attempt($request->only('email', 'password')) || auth()->attempt($request->only('username', 'password'));
+        dd($request->all());
+        $isOk = auth()->attempt($request->only('email', 'password')) || auth()->attempt($request->only('name', 'password'));
 
         if(!$isOk) {
             return response()->json([
@@ -55,13 +57,13 @@ class AuthController extends Controller
     public function register(Request $request): JsonResponse
     {
         $validate = $request->validate([
-            'username' => 'required|string',
+            'name' => 'required|string',
             'email' => 'required|email',
             'password' => 'required|string'
         ]);
 
         if($validate) {
-            $user = User::where('email', $request->email)->orWhere('username', $request->username)->first();
+            $user = User::where('email', $request->email)->orWhere('name', $request->name)->first();
 
             if($user instanceof User) {
                 return response()->json([
@@ -72,7 +74,7 @@ class AuthController extends Controller
             }
 
             $user = User::create([
-                'username' => $request->username,
+                'name' => $request->name,
                 'email' => $request->email,
                 'password' => bcrypt($request->password) // encrypt user password before saving
             ]);
@@ -90,6 +92,12 @@ class AuthController extends Controller
                     ])
                 ]);
             }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to create user',
+                'errorCode' => 400
+            ], 400);
         }
 
         return response()->json([
