@@ -9,7 +9,8 @@
         "laravel/framework": "^11.9",
         "laravel/horizon": "^5.25",
         "laravel/telescope": "^5.1",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "tymon/jwt-auth": "^2.1"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.1",

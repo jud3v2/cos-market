@@ -2,7 +2,7 @@
 
 namespace App\Services\Security;
 
-class JwtGenerator
+class JWTGenerator
 {
     private string $key;
 

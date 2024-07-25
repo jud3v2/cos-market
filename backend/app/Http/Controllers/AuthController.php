@@ -5,33 +5,26 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\User;
-
-require '../services/security/JWTGenerator.php';
+use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    /**
-     * @description Login a user
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-
     public function showLogin()
     {
         return view('login');
     }
 
     public function showRegister()
-    {  
+    {
         return view('register');
     }
 
     public function login(Request $request): JsonResponse
     {
-        dd($request->all());
-        $isOk = auth()->attempt($request->only('email', 'password')) || auth()->attempt($request->only('name', 'password'));
+        $credentials = $request->only('email', 'password');
 
-        if(!$isOk) {
+        if (! $token = JWTAuth::attempt($credentials)) {
             return response()->json([
                 "errorCode" => 400,
                 "message" => "Unable to login user with combination of user password / email or username",
@@ -41,19 +34,11 @@ class AuthController extends Controller
 
         return response()->json([
             "success" => true,
-            'token' => (new JwtGenerator())->generateToken([
-                'sub' => auth()->id(),
-                'user' => auth()->user(),
-            ]),
-            'user' => auth()->user()
+            'token' => $token,
+            'user' => Auth::user()
         ]);
     }
 
-    /**
-     * @description Register a new user
-     * @param \Illuminate\Http\Request $request
-     * @return JsonResponse
-     */
     public function register(Request $request): JsonResponse
     {
         $validate = $request->validate([
@@ -82,14 +67,13 @@ class AuthController extends Controller
             if($user instanceof User) {
                 // TODO: Send mail to user to verify email
 
+                $token = JWTAuth::fromUser($user);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'User created successfully',
                     'user' => $user,
-                    'token' => (new JwtGenerator())->generateToken([
-                        'sub' => $user->id,
-                        'user' => $user
-                    ])
+                    'token' => $token
                 ]);
             }
 
