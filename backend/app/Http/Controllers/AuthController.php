@@ -14,6 +14,17 @@ class AuthController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
+
+    public function showLogin()
+    {
+        return view('login');
+    }
+
+    public function showRegister()
+    {  
+        return view('register');
+    }
+
     public function login(Request $request): JsonResponse
     {
         $isOk = auth()->attempt($request->only('email', 'password')) || auth()->attempt($request->only('username', 'password'));
