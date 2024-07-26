@@ -11,8 +11,13 @@ use App\Http\Controllers\MusicKitsController;
 use App\Http\Controllers\PatchesController;
 use App\Http\Controllers\SkinController;
 use App\Http\Controllers\StickersController;
+use App\Http\Controllers\AdminAuthController;
 use Illuminate\Support\Facades\Route;
 
+//ROUTE ADMIN
+Route::post('/admin/login', [AdminAuthController::class, 'login']);
+
+// ROUTE CLIENTS
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
 
