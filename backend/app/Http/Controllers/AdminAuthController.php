@@ -16,7 +16,7 @@ class AdminAuthController extends Controller
         if (! $token = JWTAuth::attempt($credentials)) {
             return response()->json([
                 "errorCode" => 400,
-                "message" => "User not found",
+                "message" => "Credentials does not match",
                 "success" => false
             ], 400);
         }
