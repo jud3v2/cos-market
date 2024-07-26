@@ -1,0 +1,38 @@
+---
+# tasks file for ansible/playbooks/roles/laravel
+- name: Clone Laravel repo
+  git:
+    repo: 'git@github.com:EpitechWebAcademiePromo2025/W-WEB-502-LIL-2-1-ecommerce-judikael2.bellance.git'
+    dest: /var/www/laravel
+    version: main
+
+- name: Install Composer dependencies
+  command: composer install
+  args:
+    chdir: /var/www/laravel/backend
+
+- name: Copy environment file
+  copy:
+    src: /var/www/laravel_app/.env.example
+    dest: /var/www/laravel/backend/.env
+
+- name: Generate application key
+  command: php artisan key:generate
+  args:
+    chdir: /var/www/laravel/backend
+
+- name: Run migrations
+  command: php artisan migrate --force
+  args:
+    chdir: /var/www/laravel/backend
+
+- name: Run database seeder
+  command: php artisan db:seed --force
+  args:
+    chdir: /var/www/laravel/backend
+
+- name: Set permissions
+  command: chmod -R 775 storage bootstrap/cache
+  args:
+    chdir: /var/www/laravel/backend
+  become: yes

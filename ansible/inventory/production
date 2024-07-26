@@ -1,0 +1,5 @@
+[webservers]
+167.172.185.155 ansible_user=root
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
