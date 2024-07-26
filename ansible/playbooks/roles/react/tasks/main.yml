@@ -1,0 +1,48 @@
+---
+# tasks file for ansible/playbooks/roles/react
+- name: Update and upgrade apt packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+  become: yes
+
+- name: Install Docker
+  apt:
+    name: docker.io
+    state: present
+  become: yes
+
+- name: Install Node.js
+  apt:
+      name: nodejs
+      state: present
+  become: yes
+
+- name: Install npm
+  apt:
+      name: npm
+      state: present
+  become: yes
+
+- name: Clone React repo
+  git:
+    repo: 'git@github.com:EpitechWebAcademiePromo2025/W-WEB-502-LIL-2-1-ecommerce-judikael2.bellance.git'
+    dest: /var/www/react
+    version: main
+
+- name: Install node modules
+  npm:
+    path: /var/www/react/frontend
+    state: present
+
+- name: Build React application
+  command: npm run build
+  args:
+    chdir: /var/www/react/frontend
+
+- name: Copy build to Nginx folder
+  copy:
+    src: /var/www/react/frontend/build/
+    dest: /usr/share/nginx/html/
+    remote_src: yes
+  become: yes
