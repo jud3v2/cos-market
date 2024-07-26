@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const LoginAdmin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -16,7 +18,9 @@ const LoginAdmin = () => {
                 password,
             });
             setMessage(response.data.message);
-            // Vous pouvez rediriger l'utilisateur ou stocker le token ici
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+            navigate('/admin-panel');
         } catch (error) {
             console.error(error);
             setMessage(error.response.data.message || 'An error occurred');
