@@ -22,6 +22,17 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'steam_id',
+        'avatar',
+        'profile_url',
+        'profile_name',
+        'profile_country',
+        'profile_state',
+        'profile_city',
+        'profile_street',
+        'profile_zip',
+        'profile_phone',
+        'profile_mobile',
     ];
 
     /**

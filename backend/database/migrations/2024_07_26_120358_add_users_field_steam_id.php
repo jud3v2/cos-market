@@ -42,6 +42,6 @@ return new class extends Migration
         $table->dropColumn('profile_street');
         $table->dropColumn('profile_zip');
         $table->dropColumn('profile_phone');
-        
+        $table->dropColumn('profile_mobile');
     }
 };
