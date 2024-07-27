@@ -39,8 +39,14 @@ class ProductController extends Controller
             ]);
         }
 
+        $products = Product::all();
+
+        foreach ($products as $product) {
+            $product[$product->type] = $product->getRelatedItem();
+        }
+
         return response()->json([
-            'products' => Product::all(),
+            'products' => $products,
             'success' => true,
         ]);
     }

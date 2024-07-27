@@ -24,21 +24,21 @@ class Product extends Model
     public function getRelatedItem()
     {
         if($this->type === 'skin') {
-            return $this->hasOne(Skin::class, 'id', 'item_id');
+            return $this->hasOne(Skin::class, 'cs_go_id', 'item_id')->first();
         } elseif($this->type === "sticker") {
-            return $this->hasOne(Stickers::class, 'id', 'item_id');
+            return $this->hasOne(Stickers::class, 'cs_go_id', 'item_id');
         } elseif($this->type === "music-kit") {
-            return $this->hasOne(MusicKits::class, 'id', 'item_id');
+            return $this->hasOne(MusicKits::class, 'cs_go_id', 'item_id');
         } elseif($this->type === "graffiti") {
-            return $this->hasOne(Graffiti::class, 'id', 'item_id');
+            return $this->hasOne(Graffiti::class, 'cs_go_id', 'item_id');
         } elseif($this->type === "patch") {
-            return $this->hasOne(Patches::class, 'id', 'item_id');
+            return $this->hasOne(Patches::class, 'cs_go_id', 'item_id');
         } elseif($this->type === "collectible") {
-            return $this->hasOne(Collectible::class, 'id', 'item_id');
+            return $this->hasOne(Collectible::class, 'cs_go_id', 'item_id');
         } elseif($this->type === "key") {
-            return $this->hasOne(Keys::class, 'id', 'item_id');
+            return $this->hasOne(Keys::class, 'cs_go_id', 'item_id');
         } elseif($this->type === "crate") {
-            return $this->hasOne(Crates::class, 'id', 'item_id');
+            return $this->hasOne(Crates::class, 'cs_go_id', 'item_id');
         }
 
         return null;
