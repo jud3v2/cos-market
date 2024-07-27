@@ -17,13 +17,13 @@ class ProductController extends Controller
      */
     public function index(): JsonResponse
     {
-        if($_GET['limit'] && $_GET['page']) {
+        if(isset($_GET['limit']) && isset($_GET['page'])) {
             $limit = $_GET['limit'];
             $page = $_GET['page'];
             return response()->json(Product::paginate($limit, ['*'], 'page', $page));
         }
 
-        if($_GET['limit']) {
+        if(isset($_GET['limit'])) {
             $limit = $_GET['limit'];
             return response()->json(Product::paginate($limit));
         }
