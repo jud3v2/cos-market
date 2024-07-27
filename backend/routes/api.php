@@ -9,6 +9,7 @@ use App\Http\Controllers\GraffitiController;
 use App\Http\Controllers\KeysController;
 use App\Http\Controllers\MusicKitsController;
 use App\Http\Controllers\PatchesController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SkinController;
 use App\Http\Controllers\StickersController;
 use App\Http\Controllers\AdminAuthController;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 //ROUTE ADMIN
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
+Route::get('/admin/users', [AdminAuthController::class, 'getAllUsers']);
 
 // ROUTE CLIENTS
 Route::post('login', [AuthController::class, 'login']);
@@ -31,3 +33,4 @@ Route::resource('key', KeysController::class)->except(['create', 'edit']);
 Route::resource('music-kit', MusicKitsController::class)->except(['create', 'edit']);
 Route::resource('patches', PatchesController::class)->except(['create', 'edit']);
 Route::resource('stickers', StickersController::class)->except(['create', 'edit']);
+Route::resource('product', ProductController::class)->except(['create', 'edit']);
