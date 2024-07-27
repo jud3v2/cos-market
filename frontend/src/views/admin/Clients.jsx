@@ -39,6 +39,7 @@ const Clients = () => {
                             <th className="border px-6 py-3 text-left">Name</th>
                             <th className="border px-6 py-3 text-left">Email</th>
                             <th className="border px-6 py-3 text-left">Roles</th>
+                            <th className="border px-6 py-3 text-left">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="text-gray-600 text-sm font-light">
@@ -48,6 +49,10 @@ const Clients = () => {
                                 <td className="border px-6 py-4">{user.name}</td>
                                 <td className="border px-6 py-4">{user.email}</td>
                                 <td className='border px-6 py-4'>{user.roles}</td>
+                                <td className='border px-6 py-4 space-x-4'>
+                                    <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Edit</button>
+                                    <button className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">Delete</button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
