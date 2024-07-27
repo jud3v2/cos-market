@@ -28,7 +28,7 @@ class AdminAuthController extends Controller
         if ($roles === null || !in_array('admin', $roles)) {
             return response()->json([
                 "errorCode" => 403,
-                "message" => "Access denied. Admins only.",
+                "message" => "Access denied. Only administrator can access to this panel.",
                 "success" => false
             ], 403);
         }
