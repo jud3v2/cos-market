@@ -20,15 +20,29 @@ class ProductController extends Controller
         if(isset($_GET['limit']) && isset($_GET['page'])) {
             $limit = $_GET['limit'];
             $page = $_GET['page'];
-            return response()->json(Product::paginate($limit, ['*'], 'page', $page));
+            return response()->json([
+                'products' => Product::paginate($limit, ['*'], 'page', $page),
+                'total' => Product::count(),
+                'limit' => $limit,
+                'page' => $page,
+                'success' => true,
+            ]);
         }
 
         if(isset($_GET['limit'])) {
             $limit = $_GET['limit'];
-            return response()->json(Product::paginate($limit));
+            return response()->json([
+                'products' => Product::paginate($limit),
+                'total' => Product::count(),
+                'limit' => $limit,
+                'success' => true,
+            ]);
         }
 
-        return response()->json(Product::all());
+        return response()->json([
+            'products' => Product::all(),
+            'success' => true,
+        ]);
     }
 
     /**

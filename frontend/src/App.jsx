@@ -5,13 +5,11 @@ import AdminPanel from './views/admin/AdminPanel';
 import Clients from './views/admin/Clients';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
+import Product from "./views/admin/Product.jsx";
 
 function App() {
   const isAuthenticated = localStorage.getItem('token') !== null;
   const isAdmin = JSON.parse(localStorage.getItem('user'))?.roles.includes('admin');
-
-  console.log(isAuthenticated);
-  console.log(isAdmin);
 
   return (
     <Router>
@@ -19,6 +17,7 @@ function App() {
         <Route path="/admin/login" element={<LoginAdmin />} />
         <Route path="/admin/panel" element={<ProtectedRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminLayout><AdminPanel /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/clients" element={<ProtectedRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminLayout><Clients /></AdminLayout></ProtectedRoute>} />
+        <Route path="/admin/products" element={<ProtectedRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminLayout><Product /></AdminLayout></ProtectedRoute>} />
       </Routes>
     </Router>
   );
