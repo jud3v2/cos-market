@@ -36,7 +36,7 @@ const Clients = () => {
                     <thead>
                         <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                             <th className="border px-6 py-3 text-left">ID</th>
-                            <th className="border px-6 py-3 text-left">Nom</th>
+                            <th className="border px-6 py-3 text-left">Name</th>
                             <th className="border px-6 py-3 text-left">Email</th>
                             <th className="border px-6 py-3 text-left">Roles</th>
                         </tr>
