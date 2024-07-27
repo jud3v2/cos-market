@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,6 +7,14 @@ const LoginAdmin = () => {
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
+
+    // Vérification si l'administrateur est déjà connecté
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            navigate('/admin/panel');
+        }
+    }, [navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,6 +29,7 @@ const LoginAdmin = () => {
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
             window.location.href = '/admin-panel';
+
         } catch (error) {
             console.error(error);
             setMessage(error.response.data.message || 'An error occurred');
@@ -28,12 +37,12 @@ const LoginAdmin = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex flex-col items-center justify-center">
             <h1 className="text-2xl font-bold mb-4">Admin Login</h1>
             {message && <p className="text-red-500 mb-4">{message}</p>}
-            <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-80">
+            <form onSubmit={handleSubmit} className="p-6 rounded shadow-md w-80">
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">Email:</label>
+                    <label className="block text-sm font-medium text-white">Email:</label>
                     <input
                         type="email"
                         value={email}
@@ -43,7 +52,7 @@ const LoginAdmin = () => {
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">Password:</label>
+                    <label className="block text-sm font-medium text-white">Password:</label>
                     <input
                         type="password"
                         value={password}

@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\User;
 
 class AdminAuthController extends Controller
 {
@@ -37,6 +38,16 @@ class AdminAuthController extends Controller
             "success" => true,
             'token' => $token,
             'user' => $user
+        ]);
+    }
+
+    public function getAllUsers(Request $request): JsonResponse
+    {
+        $users = User::all();
+
+        return response()->json([
+            "success" => true,
+            'users' => $users
         ]);
     }
 }

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 //ROUTE ADMIN
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
+Route::get('/admin/users', [AdminAuthController::class, 'getAllUsers']);
 
 // ROUTE CLIENTS
 Route::post('login', [AuthController::class, 'login']);

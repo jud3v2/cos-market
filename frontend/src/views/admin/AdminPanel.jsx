@@ -1,10 +1,11 @@
 import React from 'react';
+import AdminLayout from '../../layouts/admin/AdminLayout';
+import Clients from './Clients';
 
 const AdminPanel = () => {
     return (
-        <div>
-            <h2 className="text-2xl">Welcome to the Admin Panel</h2>
-        </div>
+        <AdminLayout>
+        </AdminLayout>
     );
 };
 
