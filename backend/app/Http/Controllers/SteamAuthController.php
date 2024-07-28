@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Facades\JWTAuth;  
 
 class SteamAuthController extends Controller
 {
@@ -82,10 +83,14 @@ class SteamAuthController extends Controller
                     ]);
                 }
     
-                // Connectez l'utilisateur
-                Auth::login($user, true);
+                if ($response->successful ) {
+
+                    Auth::login($user, true);
     
-                return redirect('/')->with('success', 'Connexion réussie !');
+                    $token = JWTAuth::fromUser($user);
+        
+                    return redirect('/admin/steam-login-success?token=' . $token);
+                }
             }
         }
     
