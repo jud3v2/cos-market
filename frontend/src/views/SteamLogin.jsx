@@ -1,4 +1,3 @@
-// frontend/views/admin/SteamLogin.jsx
 import React from 'react';
 
 const SteamLogin = () => {
