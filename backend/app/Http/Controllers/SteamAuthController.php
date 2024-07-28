@@ -48,15 +48,12 @@ class SteamAuthController extends Controller
     
             if ($response->successful()) {
                 $player = $response->json()['response']['players'][0];
-    
-                // Recherchez l'utilisateur par son steam_id
                 $user = User::where('steam_id', $steamId)->first();
     
                 if ($user) {
-                    // Mettez à jour les informations de l'utilisateur existant
                     $user->update([
                         'avatar' => $player['avatarfull'],
-                        'profile_url' => $player['profileurl'],
+                        'profile_url' => $player['profileurl']?? null,
                         'profile_name' => $player['personaname'],
                         'profile_country' => $player['loccountrycode'] ?? null,
                         'profile_state' => $player['locstatecode'] ?? null,
@@ -67,11 +64,10 @@ class SteamAuthController extends Controller
                         'profile_mobile' => null,
                     ]);
                 } else {
-                    // Créez un nouvel utilisateur
                     $user = User::create([
                         'steam_id' => $steamId,
                         'avatar' => $player['avatarfull'],
-                        'profile_url' => $player['profileurl'],
+                        'profile_url' => $player['profileurl'] ?? null,
                         'profile_name' => $player['personaname'],
                         'profile_country' => $player['loccountrycode'] ?? null,
                         'profile_state' => $player['locstatecode'] ?? null,
@@ -86,14 +82,12 @@ class SteamAuthController extends Controller
                 if ($response->successful ) {
 
                     Auth::login($user, true);
-    
                     $token = JWTAuth::fromUser($user);
-        
-                    return redirect('/admin/steam-login-success?token=' . $token);
+                    return redirect(env('FRONTEND_URL') . '/steam-login-success?token=' . $token);
                 }
             }
         }
     
-        return redirect('/')->with('error', 'Failed to authenticate with Steam.');
+        return redirect('/register')->with('error', 'Failed to authenticate with Steam.');
     }    
 }
