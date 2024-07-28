@@ -11,13 +11,13 @@ import '../index.css';
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white p-6">
-      <div className="flex justify-around">
-        <div className="text-left flex flex-col">
+      <div className="flex flex-col items-center sm:flex-row sm:justify-around">
+        <div className="text-center sm:text-left flex flex-col mb-4 sm:mb-0">
           <h4 className="font-bold pb-5">Soutien</h4>
           <a href="#">Commision de vente</a>
           <a href="#">Contact</a>
         </div>
-        <div className="text-center">
+        <div className="text-center mb-4 sm:mb-0">
           <h4 className="font-bold pb-5">Payez en toute sécurité avec</h4>
           <div className="flex justify-center space-x-4">
             <img src={visa} alt="Visa" className="w-10 border px-1 bg-slate-100 rounded-lg" />
@@ -26,7 +26,7 @@ const Footer = () => {
             <img src={gpay} alt="GPay" className="w-10 border px-1 bg-slate-100 rounded-lg" />
           </div>
         </div>
-        <div className="text-left">
+        <div className="text-center sm:text-left">
           <h4 className="font-bold pb-5">Suivez nous sur</h4>
           <div className="flex justify-center space-x-4">
             <a href="#fb"><img src={facebook} alt="Facebook" className="h-8" /></a>
