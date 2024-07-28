@@ -2,7 +2,7 @@ import React from 'react';
 
 const SteamLogin = () => {
     const handleLogin = () => {
-        window.location.href = '/auth/steam';
+        window.location.href = 'http://localhost:8000/auth/steam';
     };
 
     return (
