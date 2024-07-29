@@ -1,8 +1,15 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import logo from '../assets/logo/logo_skinharem.png';
 import '../index.css';
 
 const Header = () => {
+  const location = useLocation();
+
+  const getNavItemClass = (path) => {
+    return location.pathname === path ? 'nav-item underline' : 'nav-item';
+  };
+
   return (
     <header
       className="p-1 border-b-4 border-gray-900"
@@ -13,12 +20,12 @@ const Header = () => {
       <nav className="flex flex-col sm:flex-row items-center justify-center sm:justify-around">
         <img src={logo} alt="Skin Harem Logo" className="h-32 drop-shadow-xl sm:order-2 order-1" />
         <div className="flex flex-col xl:gap-32 lg:gap-20 lg:flex-row md:flex-col sm:flex-rcol items-center order-2 sm:order-1 sm:space-x-6">
-          <a href="/" className="nav-item">ACCUEIL</a>
-          <a href="/produits" className="nav-item">PRODUITS</a>
+          <a href="/" className={getNavItemClass('/')}>ACCUEIL</a>
+          <a href="/produits" className={getNavItemClass('/produits')}>PRODUITS</a>
         </div>
         <div className="flex flex-col xl:gap-32 lg:gap-20 lg:flex-row md:flex-col sm:flex-col items-center order-3 sm:order-3 sm:space-x-6">
-          <a href="/profil" className="nav-item">PROFIL</a>
-          <a href="/panier" className="nav-item">PANIER</a>
+          <a href="/profil" className={getNavItemClass('/profil')}>PROFIL</a>
+          <a href="/panier" className={getNavItemClass('/panier')}>PANIER</a>
         </div>
       </nav>
     </header>
