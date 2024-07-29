@@ -7,6 +7,8 @@ const Card = ({ product }) => {
   const wear = JSON.parse(skin?.wears || '[]')[0]?.name || 'Usure non spécifiée';
   const statTrak = product.stattrak ? 'STATTRAK™' : '';
   const isNew = product.stock > 0 ? 'NEUVE' : 'UTILISÉE';
+  const weaponsName = JSON.parse(skin?.weapons || '{}').name || 'Nom de l\'arme non disponible';
+  const patternName = JSON.parse(skin?.pattern || '{}').name || 'Nom du motif non disponible';
 
   return (
     <div className="max-w-xs rounded-lg overflow-hidden shadow-xl m-4 bg-white">
@@ -15,7 +17,8 @@ const Card = ({ product }) => {
       </div>
       <div className="px-6 py-4">
         {statTrak && <div className="font-bold text-orange-500 text-lg mb-2">{statTrak}</div>}
-        <div className="font-bold text-xl mb-2">{name}</div>
+        <div className="font-bold text-xl ">{weaponsName}</div>
+        <div className="text-md text-gray-500">{patternName}</div>
       </div>
       <div className="px-6 pt-4 pb-2">
         <div className="flex items-center mb-2">

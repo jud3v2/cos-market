@@ -50,9 +50,7 @@ const Home = () => {
       <main className="flex-grow bg-white p-6">
         <Title text="Meilleures offres" />
         <div className="flex flex-wrap justify-center">
-          {products.map(product => (
-            <Card key={product.id} product={product} />
-          ))}
+          {products.map(product => <Card key={product.id} product={product} />)}
         </div>
       </main>
       <Footer />
