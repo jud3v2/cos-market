@@ -14,6 +14,7 @@ use App\Http\Controllers\SkinController;
 use App\Http\Controllers\StickersController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\SteamAuthController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
 //ROUTE ADMIN
@@ -36,6 +37,7 @@ Route::resource('music-kit', MusicKitsController::class)->except(['create', 'edi
 Route::resource('patches', PatchesController::class)->except(['create', 'edit']);
 Route::resource('stickers', StickersController::class)->except(['create', 'edit']);
 Route::resource('product', ProductController::class)->except(['create', 'edit']);
+Route::resource('cart', CartController::class)->except(['create', 'edit']);
 
 /* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
     return $request->user();
