@@ -1,8 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const SteamLogin = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const token = queryParams.get('token');
+
+        if (token) {
+            localStorage.setItem('token', token);
+            console.log('Token stored in localStorage:', token);
+            navigate('/');
+        } else if (localStorage.getItem('token')) {
+            console.log('Token already in localStorage, redirecting to home page');
+            navigate('/');
+        } else {
+            console.log('No token found in URL or localStorage');
+        }
+    }, [location, navigate]);
+
     const handleLogin = () => {
-        window.location.href = 'http://localhost:8000/auth/steam';
+        console.log('Redirecting to Steam login');
+        window.location.href = 'http://localhost:8000/api/steam/login';
     };
 
     return (

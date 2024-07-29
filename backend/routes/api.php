@@ -13,6 +13,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SkinController;
 use App\Http\Controllers\StickersController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\SteamAuthController;
 use Illuminate\Support\Facades\Route;
 
 //ROUTE ADMIN
@@ -20,8 +21,9 @@ Route::post('/admin/login', [AdminAuthController::class, 'login']);
 Route::get('/admin/users', [AdminAuthController::class, 'getAllUsers']);
 
 // ROUTE CLIENTS
-Route::post('login', [AuthController::class, 'login']);
-Route::post('register', [AuthController::class, 'register']);
+Route::get('steam/login', [SteamAuthController::class, 'loginWithSteam']);
+Route::get('steam/callback', [SteamAuthController::class, 'steamCallback'])->name('steam.callback');
+
 
 Route::resource('skin', SkinController::class)->except(['create', 'edit']);
 Route::resource('agent', AgentsController::class)->except(['create', 'edit']);
@@ -34,3 +36,7 @@ Route::resource('music-kit', MusicKitsController::class)->except(['create', 'edi
 Route::resource('patches', PatchesController::class)->except(['create', 'edit']);
 Route::resource('stickers', StickersController::class)->except(['create', 'edit']);
 Route::resource('product', ProductController::class)->except(['create', 'edit']);
+
+/* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
+    return $request->user();
+}); */
