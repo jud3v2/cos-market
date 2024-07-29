@@ -22,7 +22,11 @@ class CartController extends Controller
         }
 
         $cart = new Cart($_GET['steam_id']);
-        return response()->json($cart->getCart());
+        return response()->json([
+            'success' => true,
+            'cart' => $cart->getCart(),
+            'total' => $cart->getTotalPrice()
+        ]);
     }
 
     /**
