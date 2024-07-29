@@ -39,6 +39,7 @@ Route::resource('stickers', StickersController::class)->except(['create', 'edit'
 Route::resource('product', ProductController::class)->except(['create', 'edit']);
 Route::resource('cart', CartController::class)->except(['create', 'edit']);
 
+Route::get('/cart-remove/', [CartController::class, 'remove']);
 /* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
     return $request->user();
 }); */
