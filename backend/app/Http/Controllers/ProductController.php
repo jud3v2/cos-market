@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use App\Models\Skin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -66,10 +67,38 @@ class ProductController extends Controller
                 'price' => 'required|numeric',
                 'isActive' => 'required|boolean',
                 'description' => 'required|string|min:10',
+                'usage' => 'required|string', // Make usage nullable
                 'slug' => 'nullable|string' // Make slug nullable
+            ], [
+                'usage.required' => 'Usage is required',
+                'usage.string' => 'Usage must be a string value',
             ]);
 
             $validatedData['slug'] = $validatedData['slug'] ?? Str::slug($validatedData['name']);
+
+            if($validatedData['type'] === 'skin') {
+                $skin = Skin::where('cs_go_id', $validatedData['item_id'])->first();
+                if(!$skin) {
+                    return response()->json(['message' => 'Skin not found'], 404);
+                } else {
+                    //check usage validation
+                    if((float) $validatedData['usage'] < (float) $skin->min_float) {
+                        return response()->json(['message' => 'Usage must be greater than or equal to the minimum float value of the skin', [
+                            'values' => [
+                                'min_float' => $skin->min_float,
+                                'max_float' => $skin->max_float
+                            ]
+                        ]], 422);
+                    } else if((float) $validatedData['usage'] > (float) $skin->max_float) {
+                        return response()->json(['message' => 'Usage must be less than or equal to the maximum float value of the skin', [
+                            'values' => [
+                                'min_float' => $skin->min_float,
+                                'max_float' => $skin->max_float
+                            ]
+                        ]], 422);
+                    }
+                }
+            }
 
             $product = Product::create($validatedData);
 
@@ -89,7 +118,7 @@ class ProductController extends Controller
      */
     public function show(Product $product): JsonResponse
     {
-        return response()->json($product);
+        return response()->json(['product' => $product, 'success' => true, 'item' => $product->getRelatedItem()]);
     }
 
     /**
@@ -106,7 +135,38 @@ class ProductController extends Controller
                 'price' => 'required|numeric',
                 'isActive' => 'required|boolean',
                 'description' => 'required|string|min:10',
+                'usage' => 'required|string',
+            ], [
+                'usage.required' => 'Usage is required',
+                'usage.string' => 'Usage must be a string value',
             ]);
+
+
+            if($data['type'] === 'skin') {
+                $skin = Skin::where('cs_go_id', $data['item_id'])->first();
+                if(!$skin) {
+                    return response()->json(['message' => 'Skin not found'], 404);
+                } else {
+                    //check usage validation
+                    if((float) $data['usage'] < (float) $skin->min_float) {
+                        return response()->json(['message' => 'Usage must be greater than or equal to the minimum float value of the skin', [
+                            'values' => [
+                                'min_float' => $skin->min_float,
+                                'max_float' => $skin->max_float
+                            ]
+                        ]], 422);
+                    } else if((float) $data['usage'] > (float) $skin->max_float) {
+                        return response()->json(['message' => 'Usage must be less than or equal to the maximum float value of the skin', [
+                            'values' => [
+                                'min_float' => $skin->min_float,
+                                'max_float' => $skin->max_float
+                            ]
+                        ]], 422);
+                    }
+                }
+            }
+
+            $product->slug = $data['slug'] ?? Str::slug($data['name']);
 
             $product->update($data);
 
