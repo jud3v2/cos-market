@@ -12,9 +12,16 @@ const ProductCard = ({ product }) => {
   const formattedDate = new Date(created_at).toLocaleDateString();
 
   return (
-      <div className="mt-4 border flex w-full max-w-4xl items-center rounded-lg overflow-hidden shadow-xl  bg-white">
-        <div className="w-1/4 p-4">
-          <img className="w-full" src={imageUrl} alt={name} />
+    <div className="mt-4 border flex w-full max-w-4xl items-center rounded-lg overflow-hidden shadow-xl bg-white">
+      <div className="w-1/4 p-4">
+        <img className="w-full" src={imageUrl} alt={name} />
+      </div>
+      <div className="w-3/4 px-6 py-4 flex flex-col justify-between">
+        <div>
+          {statTrak && <div className="font-bold text-orange-500 text-lg mb-2">{statTrak}</div>}
+          <div className="font-bold text-xl mb-2">{name}</div>
+          <div className="text-sm text-gray-700">{weaponsName}</div>
+          <div className="text-sm text-gray-500">{patternName}</div>
         </div>
         <div className="w-3/4 px-6 py-4 flex flex-col justify-between">
           <div>
@@ -40,6 +47,7 @@ const ProductCard = ({ product }) => {
           </div>
         </div>
       </div>
+    </div>
   );
 };
 
