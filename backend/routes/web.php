@@ -10,8 +10,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-<<<<<<< HEAD
-=======
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 
@@ -21,4 +19,3 @@ Route::get('auth/steam/callback', [SteamAuthController::class, 'handleSteamCallb
 Route::middleware('auth.jwt')->get('/user', function (Request $request) {
     return $request->user();
 });
->>>>>>> ea7608b ([MERGE] branch flo)
