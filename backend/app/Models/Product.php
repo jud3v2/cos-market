@@ -18,7 +18,8 @@ class Product extends Model
         'isActive',
         'type',
         'item_id',
-        "stock"
+        "stock",
+        'usage'
     ];
 
     public function getRelatedItem()
