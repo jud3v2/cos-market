@@ -25,14 +25,11 @@ function App() {
         <Route path="/admin/panel" element={<ProtectedRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminLayout><AdminPanel /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/clients" element={<ProtectedRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminLayout><Clients /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/products" element={<ProtectedRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminLayout><Product /></AdminLayout></ProtectedRoute>} />
-<<<<<<< HEAD
         <Route path="/steam/login" element={<SteamLogin />} />
         <Route path="/steam/login/success" element={<SteamLoginSuccess />} />
         <Route path="/steam/auth/callback" element={<Home/>} />
-=======
         <Route path="/admin/steam-login" element={<SteamLogin />} />
         <Route path="/admin/steam-login-success" element={<SteamLoginSuccess />} />
->>>>>>> ea7608b ([MERGE] branch flo)
       </Routes>
     </Router>
   );
