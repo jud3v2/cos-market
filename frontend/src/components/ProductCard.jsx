@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
   const { name, price, skin, created_at } = product;
@@ -17,12 +18,6 @@ const ProductCard = ({ product }) => {
         <img className="w-full" src={imageUrl} alt={name} />
       </div>
       <div className="w-3/4 px-6 py-4 flex flex-col justify-between">
-        <div>
-          {statTrak && <div className="font-bold text-orange-500 text-lg mb-2">{statTrak}</div>}
-          <div className="font-bold text-xl mb-2">{name}</div>
-          <div className="text-sm text-gray-700">{weaponsName}</div>
-          <div className="text-sm text-gray-500">{patternName}</div>
-        </div>
         <div className="w-3/4 px-6 py-4 flex flex-col justify-between">
           <div>
             {statTrak && <div className="font-bold text-orange-500 text-lg mb-2">{statTrak}</div>}

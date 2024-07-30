@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Card = ({ product }) => {
-  const { name, price, skin } = product;
+  const { id, name, price, skin } = product;
   const imageUrl = skin?.image || 'default-image.png';
   const rarity = skin?.rarity?.name || 'Rareté non disponible';
   const wear = JSON.parse(skin?.wears || '[]')[0]?.name || 'Usure non spécifiée';
@@ -11,7 +12,7 @@ const Card = ({ product }) => {
   const patternName = JSON.parse(skin?.pattern || '{}').name || 'Nom du motif non disponible';
 
   return (
-    <div className="max-w-xs rounded-lg overflow-hidden shadow-xl m-4 bg-white">
+    <Link to={`/product/${id}`} className="block max-w-xs rounded-lg overflow-hidden shadow-xl m-4 bg-white">
       <div className="px-4 py-2">
         <img className="w-full p-2" src={imageUrl} alt={name} />
       </div>
@@ -33,7 +34,7 @@ const Card = ({ product }) => {
           <span className="text-lg font-semibold text-gray-900">{price} $</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

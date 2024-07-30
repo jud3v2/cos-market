@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Product from "./views/admin/Product.jsx";
 import Panier from './page/Panier';
 import './App.css';
+import ProductDetail from './components/ProductDetails.jsx';
 
 function App() {
   const isAuthenticated = localStorage.getItem('token') !== null;
@@ -25,6 +26,8 @@ function App() {
           <Route path="/admin/panel" element={<ProtectedRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminLayout><AdminPanel /></AdminLayout></ProtectedRoute>} />
           <Route path="/admin/clients" element={<ProtectedRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminLayout><Clients /></AdminLayout></ProtectedRoute>} />
           <Route path="/admin/products" element={<ProtectedRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminLayout><Product /></AdminLayout></ProtectedRoute>} />
+          <Route path="/product/:id" element={<ClientLayout><ProductDetail /></ClientLayout>} />
+
         </Routes>
       </Router>
   );
