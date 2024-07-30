@@ -6,11 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-<<<<<<< HEAD
 use Tymon\JWTAuth\Facades\JWTAuth;
-=======
-use Tymon\JWTAuth\Facades\JWTAuth;  
->>>>>>> ea7608b ([MERGE] branch flo)
 
 class SteamAuthController extends Controller
 {
@@ -79,22 +75,9 @@ class SteamAuthController extends Controller
                         'profile_mobile' => null,
                     ]);
                 }
-<<<<<<< HEAD
 
                 $token = JWTAuth::fromUser($user);
                 return redirect()->away('http://localhost:5173/steam/login?token=' . $token);
-                return;
-=======
-    
-                if ($response->successful ) {
-
-                    Auth::login($user, true);
-    
-                    $token = JWTAuth::fromUser($user);
-        
-                    return redirect('/admin/steam-login-success?token=' . $token);
-                }
->>>>>>> ea7608b ([MERGE] branch flo)
             }
         }
         return redirect('/')->with('error', 'Authentication failed.');
