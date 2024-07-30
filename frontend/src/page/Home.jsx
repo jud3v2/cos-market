@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 import Card from '../components/Card';
 import Title from '../components/Title';
 import '../index.css';
@@ -46,14 +44,12 @@ const Home = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
       <main className="flex-grow bg-white p-6">
         <Title text="Meilleures offres" />
         <div className="flex flex-wrap justify-center">
           {products.map(product => <Card key={product.id} product={product} />)}
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

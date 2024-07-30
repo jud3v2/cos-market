@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import Dropdown from '../components/Dropdown';
 import '../index.css';
@@ -46,7 +44,6 @@ const Products = () => {
 
   return (
       <div className="flex flex-col min-h-screen">
-        <Header />
         <main className="flex-grow bg-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <input type="text" placeholder="Rechercher..." className="p-2 border rounded w-full max-w-xs" />
@@ -63,7 +60,6 @@ const Products = () => {
             ))}
           </div>
         </main>
-        <Footer />
       </div>
   );
 };
