@@ -6,9 +6,8 @@ import LoginAdmin from './views/admin/LoginAdmin';
 import AdminPanel from './views/admin/AdminPanel';
 import Clients from './views/admin/Clients';
 import ProtectedRoute from './components/ProtectedRoute';
-import Header from './components/Header';
-import SteamLogin from './views/admin/SteamLogin';
-import SteamLoginSuccess from './views/admin/SteamLoginSuccess';
+import SteamLogin from './views/SteamLogin.jsx';
+import SteamLoginSuccess from './views/SteamLoginSuccess.jsx';
 import './App.css';
 import Product from "./views/admin/Product.jsx";
 
