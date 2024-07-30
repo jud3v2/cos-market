@@ -7,7 +7,7 @@ const Header = () => {
   const location = useLocation();
 
   const getNavItemClass = (path) => {
-    return location.pathname === path ? 'nav-item underline' : 'nav-item';
+    return location.pathname === path ? 'nav-item border-b-4 border-gray-950 ' : 'nav-item';
   };
 
   return (

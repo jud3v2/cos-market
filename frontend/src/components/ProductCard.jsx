@@ -12,7 +12,7 @@ const ProductCard = ({ product }) => {
   const formattedDate = new Date(created_at).toLocaleDateString();
 
   return (
-    <div className="max-w-4xl flex items-center rounded-lg overflow-hidden shadow-xl m-4 bg-white">
+    <div className="mt-4 border flex w-full max-w-4xl items-center rounded-lg overflow-hidden shadow-xl  bg-white">
       <div className="w-1/4 p-4">
         <img className="w-full" src={imageUrl} alt={name} />
       </div>

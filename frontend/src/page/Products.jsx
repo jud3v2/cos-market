@@ -57,7 +57,7 @@ const Products = () => {
           </div>
           <Dropdown label="AFFICHAGE" options={['Affi 1', 'Affi 2', 'Affi 3']} />
         </div>
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {products.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}

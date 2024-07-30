@@ -6,7 +6,6 @@ import LoginAdmin from './views/admin/LoginAdmin';
 import AdminPanel from './views/admin/AdminPanel';
 import Clients from './views/admin/Clients';
 import ProtectedRoute from './components/ProtectedRoute';
-import Header from './components/Header';
 import './App.css';
 import Product from "./views/admin/Product.jsx";
 
