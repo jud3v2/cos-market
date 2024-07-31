@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
-  const { name, price, skin, created_at } = product;
+  const { id, name, price, skin, created_at } = product;
   const imageUrl = skin?.image || 'default-image.png';
   const rarity = skin?.rarity?.name || 'Rareté non disponible';
   const wear = JSON.parse(skin?.wears || '[]')[0]?.name || 'Usure non spécifiée';
@@ -12,7 +13,7 @@ const ProductCard = ({ product }) => {
   const formattedDate = new Date(created_at).toLocaleDateString();
 
   return (
-    <div className="mt-4 border flex w-full max-w-4xl items-center rounded-lg overflow-hidden shadow-xl bg-white">
+    <Link to={`/product/${id}`} className="mt-4 border flex w-full max-w-4xl items-center rounded-lg overflow-hidden shadow-xl bg-white">
       <div className="w-1/4 p-4">
         <img className="w-full" src={imageUrl} alt={name} />
       </div>
@@ -39,7 +40,7 @@ const ProductCard = ({ product }) => {
             <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${(skin.min_float * 100).toFixed(2)}%` }}></div>
           </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
