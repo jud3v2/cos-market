@@ -19,20 +19,7 @@ import ProductDetails from "./components/ProductDetails.jsx";
 function App() {
   const isAuthenticated = localStorage.getItem('token') !== null;
   const isAdmin = JSON.parse(localStorage.getItem('user'))?.roles.includes('admin');
-        function Layout(Page, Layout, pageProps, layoutProps) {
-                return Layout ? (
-                    <Layout {...layoutProps}>
-                            <Page {...pageProps} />
-                            <ReactToastify />
-                    </Layout>
-                ) : <Page {...pageProps} />;
-        }
-        const adminProtectedRoute = (Page, layoutProps, pageProps) => {
-                return <ProtectedRoute isAdmin={isAdmin} isAuthenticated={isAuthenticated} >
-                        {Layout(Page, AdminLayout, pageProps, layoutProps)}
-                </ProtectedRoute>
-        }
-
+  
   function Layout(Page, Layout, pageProps, layoutProps) {
     return Layout ? (
         <Layout {...layoutProps}>
