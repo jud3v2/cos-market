@@ -10,22 +10,39 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Product from "./views/admin/Product.jsx";
 import Panier from './page/Panier';
 import './App.css';
+import ReactToastify from "./components/ReactToastify.jsx";
+import adminPanel from "./views/admin/AdminPanel";
+
+function Layout(Page, Layout, pageProps, layoutProps) {
+        return Layout ? (
+            <Layout {...layoutProps}>
+                    <Page {...pageProps} />
+                    <ReactToastify />
+            </Layout>
+        ) : <Page {...pageProps} />;
+}
 
 function App() {
   const isAuthenticated = localStorage.getItem('token') !== null;
   const isAdmin = JSON.parse(localStorage.getItem('user'))?.roles.includes('admin');
 
+        const adminProtectedRoute = (Page, layoutProps, pageProps) => {
+                return <ProtectedRoute isAdmin={isAdmin} isAuthenticated={isAuthenticated} >
+                        {Layout(Page, AdminLayout, pageProps, layoutProps)}
+                </ProtectedRoute>
+        }
+
   return (
       <Router>
-        <Routes>
-        <Route path="/" element={<ClientLayout><Home /></ClientLayout>} />
-          <Route path="/produits" element={<ClientLayout><Products /></ClientLayout>} />
-          <Route path="/panier" element={<Panier />} />
-          <Route path="/admin/login" element={<LoginAdmin />} />
-          <Route path="/admin/panel" element={<ProtectedRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminLayout><AdminPanel /></AdminLayout></ProtectedRoute>} />
-          <Route path="/admin/clients" element={<ProtectedRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminLayout><Clients /></AdminLayout></ProtectedRoute>} />
-          <Route path="/admin/products" element={<ProtectedRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminLayout><Product /></AdminLayout></ProtectedRoute>} />
-        </Routes>
+              <Routes>
+                      <Route path="/" element={Layout(Home, ClientLayout, {}, {})} />
+                      <Route path="/produits" element={Layout(Products, ClientLayout, {}, {})} />
+                      <Route path="/panier" element={Layout(Panier, ClientLayout,  {}, {})} />
+                      <Route path="/admin/login" element={Layout(LoginAdmin)} />
+                      <Route path="/admin/panel" element={adminProtectedRoute(adminPanel)} />
+                      <Route path="/admin/clients" element={adminProtectedRoute(Clients)} />
+                      <Route path="/admin/products" element={adminProtectedRoute(Product)} />
+              </Routes>
       </Router>
   );
 }

@@ -16,13 +16,6 @@ const ProductCard = ({ product }) => {
       <div className="w-1/4 p-4">
         <img className="w-full" src={imageUrl} alt={name} />
       </div>
-      <div className="w-3/4 px-6 py-4 flex flex-col justify-between">
-        <div>
-          {statTrak && <div className="font-bold text-orange-500 text-lg mb-2">{statTrak}</div>}
-          <div className="font-bold text-xl mb-2">{name}</div>
-          <div className="text-sm text-gray-700">{weaponsName}</div>
-          <div className="text-sm text-gray-500">{patternName}</div>
-        </div>
         <div className="w-3/4 px-6 py-4 flex flex-col justify-between">
           <div>
             {statTrak && <div className="font-bold text-orange-500 text-lg mb-2">{statTrak}</div>}
@@ -45,7 +38,6 @@ const ProductCard = ({ product }) => {
           <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
             <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${(skin.min_float * 100).toFixed(2)}%` }}></div>
           </div>
-        </div>
       </div>
     </div>
   );

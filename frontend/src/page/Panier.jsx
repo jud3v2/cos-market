@@ -24,7 +24,6 @@ const Panier = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
       <main className="flex-grow bg-gray-100 p-6">
         <h1 className="text-3xl font-bold mb-4">Panier</h1>
         <div className="grid grid-cols-1 gap-6">

@@ -17,7 +17,6 @@ const Home = () => {
         return response.json();
       })
       .then(data => {
-        console.log(data);
         if (Array.isArray(data)) {
           setProducts(data);
         } else if (Array.isArray(data.products)) {
