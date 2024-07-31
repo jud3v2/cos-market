@@ -12,12 +12,26 @@ import Panier from './page/Panier';
 import ProductDetails from './components/ProductDetails';
 import './App.css';
 import ReactToastify from "./components/ReactToastify.jsx";
-
+import adminPanel from "./views/admin/AdminPanel";
+import ProductDetails from "./components/ProductDetails.jsx";
 
 
 function App() {
   const isAuthenticated = localStorage.getItem('token') !== null;
   const isAdmin = JSON.parse(localStorage.getItem('user'))?.roles.includes('admin');
+        function Layout(Page, Layout, pageProps, layoutProps) {
+                return Layout ? (
+                    <Layout {...layoutProps}>
+                            <Page {...pageProps} />
+                            <ReactToastify />
+                    </Layout>
+                ) : <Page {...pageProps} />;
+        }
+        const adminProtectedRoute = (Page, layoutProps, pageProps) => {
+                return <ProtectedRoute isAdmin={isAdmin} isAuthenticated={isAuthenticated} >
+                        {Layout(Page, AdminLayout, pageProps, layoutProps)}
+                </ProtectedRoute>
+        }
 
   function Layout(Page, Layout, pageProps, layoutProps) {
     return Layout ? (
@@ -41,6 +55,9 @@ function App() {
                       <Route path="/produits" element={Layout(Products, ClientLayout, {}, {})} />
                       <Route path="/panier" element={Layout(Panier, ClientLayout,  {}, {})} />
                       <Route path="/admin/login" element={Layout(LoginAdmin)} />
+                      <Route path="/admin/panel" element={adminProtectedRoute(AdminPanel)} />
+                      <Route path="/admin/clients" element={adminProtectedRoute(Clients)} />
+                      <Route path="/admin/products" element={adminProtectedRoute(Product)} />
                       <Route path="/admin/panel" element={adminProtectedRoute(AdminPanel)} />
                       <Route path="/admin/clients" element={adminProtectedRoute(Clients)} />
                       <Route path="/admin/products" element={adminProtectedRoute(Product)} />

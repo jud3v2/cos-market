@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
   const { name, price, skin, created_at } = product;
@@ -17,7 +16,6 @@ const ProductCard = ({ product }) => {
       <div className="w-1/4 p-4">
         <img className="w-full" src={imageUrl} alt={name} />
       </div>
-      <div className="w-3/4 px-6 py-4 flex flex-col justify-between">
         <div className="w-3/4 px-6 py-4 flex flex-col justify-between">
           <div>
             {statTrak && <div className="font-bold text-orange-500 text-lg mb-2">{statTrak}</div>}
@@ -40,7 +38,6 @@ const ProductCard = ({ product }) => {
           <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
             <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${(skin.min_float * 100).toFixed(2)}%` }}></div>
           </div>
-        </div>
       </div>
     </div>
   );
