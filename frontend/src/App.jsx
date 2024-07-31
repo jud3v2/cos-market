@@ -9,6 +9,7 @@ import Clients from './views/admin/Clients';
 import ProtectedRoute from './components/ProtectedRoute';
 import Product from "./views/admin/Product.jsx";
 import Panier from './page/Panier';
+import ProductDetails from './components/ProductDetails';
 import './App.css';
 import ReactToastify from "./components/ReactToastify.jsx";
 import adminPanel from "./views/admin/AdminPanel";
@@ -32,6 +33,21 @@ function App() {
                 </ProtectedRoute>
         }
 
+  function Layout(Page, Layout, pageProps, layoutProps) {
+    return Layout ? (
+        <Layout {...layoutProps}>
+                <Page {...pageProps} />
+                <ReactToastify />
+        </Layout>
+    ) : <Page {...pageProps} />;
+}
+
+        const adminProtectedRoute = (Page, layoutProps, pageProps) => {
+                return <ProtectedRoute isAdmin={isAdmin} isAuthenticated={isAuthenticated} >
+                        {Layout(Page, AdminLayout, pageProps, layoutProps)}
+                </ProtectedRoute>
+        }
+
   return (
       <Router>
               <Routes>
@@ -39,10 +55,13 @@ function App() {
                       <Route path="/produits" element={Layout(Products, ClientLayout, {}, {})} />
                       <Route path="/panier" element={Layout(Panier, ClientLayout,  {}, {})} />
                       <Route path="/admin/login" element={Layout(LoginAdmin)} />
-                      <Route path="/product/:id" element={Layout(ProductDetails, ClientLayout, {}, {})} />
                       <Route path="/admin/panel" element={adminProtectedRoute(AdminPanel)} />
                       <Route path="/admin/clients" element={adminProtectedRoute(Clients)} />
                       <Route path="/admin/products" element={adminProtectedRoute(Product)} />
+                      <Route path="/admin/panel" element={adminProtectedRoute(AdminPanel)} />
+                      <Route path="/admin/clients" element={adminProtectedRoute(Clients)} />
+                      <Route path="/admin/products" element={adminProtectedRoute(Product)} />
+                      <Route path="/product/:id" element={Layout(ProductDetails, ClientLayout, {}, {})} />
               </Routes>
       </Router>
   );
