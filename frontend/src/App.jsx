@@ -12,8 +12,7 @@ import Panier from './page/Panier';
 import ProductDetails from './components/ProductDetails';
 import './App.css';
 import ReactToastify from "./components/ReactToastify.jsx";
-import adminPanel from "./views/admin/AdminPanel";
-
+import SteamLogin from "./views/SteamLogin.jsx";
 
 function App() {
   const isAuthenticated = localStorage.getItem('token') !== null;
@@ -48,6 +47,7 @@ function App() {
                       <Route path="/admin/clients" element={adminProtectedRoute(Clients)} />
                       <Route path="/admin/products" element={adminProtectedRoute(Product)} />
                       <Route path="/product/:id" element={Layout(ProductDetails, ClientLayout, {}, {})} />
+                      <Route path={"/steam/login"} element={Layout(SteamLogin, ClientLayout, {}, {})} />
               </Routes>
       </Router>
   );
