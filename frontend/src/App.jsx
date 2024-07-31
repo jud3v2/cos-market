@@ -12,6 +12,7 @@ import Panier from './page/Panier';
 import './App.css';
 import ReactToastify from "./components/ReactToastify.jsx";
 import adminPanel from "./views/admin/AdminPanel";
+import ProductDetails from "./components/ProductDetails.jsx";
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
                       <Route path="/produits" element={Layout(Products, ClientLayout, {}, {})} />
                       <Route path="/panier" element={Layout(Panier, ClientLayout,  {}, {})} />
                       <Route path="/admin/login" element={Layout(LoginAdmin)} />
+                      <Route path="/product/:id" element={Layout(ProductDetails, ClientLayout, {}, {})} />
                       <Route path="/admin/panel" element={adminProtectedRoute(AdminPanel)} />
                       <Route path="/admin/clients" element={adminProtectedRoute(Clients)} />
                       <Route path="/admin/products" element={adminProtectedRoute(Product)} />
