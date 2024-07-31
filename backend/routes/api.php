@@ -43,3 +43,7 @@ Route::get('/cart-remove/', [CartController::class, 'remove']);
 /* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
     return $request->user();
 }); */
+
+/* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
+    return $request->user();
+}); */
