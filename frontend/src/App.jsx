@@ -13,13 +13,12 @@ import ProductDetails from './components/ProductDetails';
 import './App.css';
 import ReactToastify from "./components/ReactToastify.jsx";
 import adminPanel from "./views/admin/AdminPanel";
-import ProductDetails from "./components/ProductDetails.jsx";
 
 
 function App() {
   const isAuthenticated = localStorage.getItem('token') !== null;
   const isAdmin = JSON.parse(localStorage.getItem('user'))?.roles.includes('admin');
-  
+
   function Layout(Page, Layout, pageProps, layoutProps) {
     return Layout ? (
         <Layout {...layoutProps}>
