@@ -43,22 +43,49 @@ const ProductDetail = () => {
     return <div>Aucun produit trouvé</div>;
   }
 
-  const { name, description, weapons, pattern, min_float, max_float, rarity, collections } = item;
+  const { description, weapons, pattern, min_float, max_float, collections, wears } = item;
+  const { price, skin } = product;
+  const imageUrl = skin?.image || 'default-image.png';
+  const rarity = skin?.rarity?.name || 'Rareté non disponible';
+  const wear = JSON.parse(skin?.wears || '[]')[0]?.name || 'Usure non spécifiée';
+  const statTrak = product.stattrak ? 'STATTRAK™' : '';
+  const isNew = product.stock > 0 ? 'NEUVE' : 'UTILISÉE';
+  const weaponsName = JSON.parse(skin?.weapons || '{}').name || 'Nom de l\'arme non disponible';
+  const patternName = JSON.parse(skin?.pattern || '{}').name || 'Nom du motif non disponible';
+
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">{name}</h1>
+      <h1 className="text-3xl font-bold mb-4">{item.name}</h1>
       <div className="flex flex-col md:flex-row">
         <div className="flex-1">
-          <img src={item.image} alt={name} className="mb-4 max-w-full" />
+          <img src={item.image} alt={item.name} className="mb-4 max-w-full" />
         </div>
         <div className="flex-1 ml-0 md:ml-4">
-          <div className="text-2xl font-semibold mb-2">{rarity.name}</div>
-          <p className="mb-4">{description}</p>
           <div className="mb-4">
-            <span className="font-bold">Arme :</span> {weapons.name}
+            <span className='font-bold'>Description : </span>{description}
           </div>
           <div className="mb-4">
-            <span className="font-bold">Motif :</span> {pattern.name}
+            <span className="font-bold">Arme :</span> {item.name}
+          </div>
+          <div className="mb-4">
+            <span className="font-bold">Motif :</span> {JSON.parse(pattern).name}
+          </div>
+          <div className="mb-4">
+            <span className="font-bold">Catégorie :</span> {JSON.parse(item.category).name} 
+          </div>
+          <div className="mb-4">
+            <span className="font-bold">Rareté :</span> {JSON.parse(item.rarity).name}
+          </div>
+          <div className="mb-4">
+            
+            <span className="font-bold">Collection :</span> {JSON.parse(JSON.parse(collections)).map(collection => {
+              return (
+                <div key={collection.name}>
+                <img src={collection.image} alt={collection.name} className="w-10 h-10 inline-block mr-2" />
+                  <span key={collection.id}>{collection.name}</span> <br/>
+                </div >
+              )
+            })}
           </div>
           <div className="mb-4">
             <span className="font-bold">Usure minimale :</span> {min_float}
@@ -66,6 +93,37 @@ const ProductDetail = () => {
           <div className="mb-4">
             <span className="font-bold">Usure maximale :</span> {max_float}
           </div>
+          <div className="mb-4">
+            <span className="font-bold">Usure :</span> {product.usage}
+          </div>
+          <div className="mb-4">
+            <h3 className='font-bold text-2xl'>Caisse : </h3>
+            {JSON.parse(JSON.parse(item.crates))?.map(crate => {
+              return (
+                <div key={crate.name}>
+                  <img src={crate.image} alt={crate.name} className="w-10 h-10 inline-block mr-2" />
+                <span key={crate.id} className="font-bold">Caisse :</span> {crate.name} <br/>
+                </div >
+              )
+            })}
+          </div>
+          <div className="mb-4">
+            <span className="font-bold">StatTrak :</span> {product.stattrak ? 'Oui' : 'Non'}
+          </div>
+
+          <div className="mb-4">
+            <span className="font-bold">Souvenir :</span> {product.souvenir ? 'Oui' : 'Non'}
+          </div>
+
+          <div className="mb-4">
+            <span className="font-bold">Usure disponible :</span> {JSON.parse(JSON.parse(wears)).map(wear => { 
+              return (
+                <div key={wear.id}>
+                  <br/> <span key={wear.id}>{wear.name}</span>
+                </div >
+              )
+            })}
+          </div> 
         </div>
       </div>
     </div>
