@@ -28,7 +28,7 @@ const LoginAdmin = () => {
             setMessage(response.data.message);
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
-            window.location.href = '/admin-panel';
+            window.location.href = '/admin/panel';
 
         } catch (error) {
             console.error(error);
