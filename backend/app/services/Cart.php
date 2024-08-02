@@ -44,7 +44,6 @@ class Cart
         $this->products[] = $product;
         return true;
     }
-
     public function removeProduct(Product $product): bool
     {
         $newCart = array_filter($this->products, function ($p) use ($product) {
