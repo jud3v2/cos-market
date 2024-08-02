@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 
 const ProductDetail = () => {
@@ -8,9 +8,30 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const scrollRef = useRef(null);
+
   useEffect(() => {
     fetchProduct();
-    }, []);
+  }, []);
+
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    let scrollAmount = 0;
+
+    const scrollStep = () => {
+      scrollAmount += 0.5;
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollAmount;
+        if (scrollAmount >= scrollContainer.scrollHeight - scrollContainer.clientHeight) {
+          scrollAmount = 0;
+        }
+      }
+    };
+
+    const interval = setInterval(scrollStep, 20);
+
+    return () => clearInterval(interval); 
+  }, [item]);
 
   const fetchProduct = async () => {
     try {
@@ -20,16 +41,15 @@ const ProductDetail = () => {
       }
       const data = await response.json();
       setProduct(data.product);
-        setItem(data.item);
-    setLoading(false);
+      setItem(data.item);
+      setLoading(false);
 
       return data;
-    
     } catch (err) {
       console.error(err);
       setError('Erreur lors de la récupération des données');
-    } 
-};
+    }
+  };
 
   if (loading) {
     return <div>Chargement...</div>;
@@ -71,19 +91,18 @@ const ProductDetail = () => {
             <span className="font-bold">Motif :</span> {JSON.parse(pattern).name}
           </div>
           <div className="mb-4">
-            <span className="font-bold">Catégorie :</span> {JSON.parse(item.category).name} 
+            <span className="font-bold">Catégorie :</span> {JSON.parse(item.category).name}
           </div>
           <div className="mb-4">
             <span className="font-bold">Rareté :</span> {JSON.parse(item.rarity).name}
           </div>
           <div className="mb-4">
-            
             <span className="font-bold">Collection :</span> {JSON.parse(JSON.parse(collections)).map(collection => {
               return (
                 <div key={collection.name}>
-                <img src={collection.image} alt={collection.name} className="w-10 h-10 inline-block mr-2" />
-                  <span key={collection.id}>{collection.name}</span> <br/>
-                </div >
+                  <img src={collection.image} alt={collection.name} className="w-10 h-10 inline-block mr-2" />
+                  <span key={collection.id}>{collection.name}</span> <br />
+                </div>
               )
             })}
           </div>
@@ -98,32 +117,23 @@ const ProductDetail = () => {
           </div>
           <div className="mb-4">
             <h3 className='font-bold text-2xl'>Caisse : </h3>
-            {JSON.parse(JSON.parse(item.crates))?.map(crate => {
-              return (
-                <div key={crate.name}>
-                  <img src={crate.image} alt={crate.name} className="w-10 h-10 inline-block mr-2" />
-                <span key={crate.id} className="font-bold">Caisse :</span> {crate.name} <br/>
-                </div >
-              )
-            })}
+            <div className="max-h-24 overflow-y-auto" ref={scrollRef}>
+              {JSON.parse(JSON.parse(item.crates))?.map(crate => {
+                return (
+                  <div key={crate.name} className="mb-2">
+                    <img src={crate.image} alt={crate.name} className="w-10 h-10 inline-block mr-2" />
+                    <span className="font-bold">Caisse :</span> {crate.name} <br />
+                  </div>
+                );
+              })}
+            </div>
           </div>
           <div className="mb-4">
             <span className="font-bold">StatTrak :</span> {product.stattrak ? 'Oui' : 'Non'}
           </div>
-
           <div className="mb-4">
             <span className="font-bold">Souvenir :</span> {product.souvenir ? 'Oui' : 'Non'}
           </div>
-
-          <div className="mb-4">
-            <span className="font-bold">Usure disponible :</span> {JSON.parse(JSON.parse(wears)).map(wear => { 
-              return (
-                <div key={wear.id}>
-                  <br/> <span key={wear.id}>{wear.name}</span>
-                </div >
-              )
-            })}
-          </div> 
         </div>
       </div>
     </div>
