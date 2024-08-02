@@ -22,35 +22,50 @@ class CartController extends Controller
             ],400);
         }
 
-        $cart = new Cart($_GET['steam_id']);
+        $cart = new Cart($_GET['steam_id'] ?? $steamId);
+       if(isset($_GET['steam_id'])) {
         return response()->json([
             'success' => true,
             'cart' => $cart->getCart(),
             'total' => $cart->getTotalPrice()
-        ]);
+        ]); }
+
+        return [
+            'success' => true,
+            'cart' => $cart->getCart(),
+            'total' => $cart->getTotalPrice()
+        ];
+
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): JsonResponse
-    {
-        $cart = new Cart($_GET['steam_id']);
-        if($cart->save()) {
+public function store(Request $request): JsonResponse
+{
+    try {
+        $cart = new Cart($request->get('steam_id'));
+        if ($cart->save()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Cart saved to DB',
                 'cart' => $cart->getCart()
             ]);
         } else {
-
             return response()->json([
                 'success' => false,
                 'message' => 'Cart not saved to DB',
                 'errorCode' => 400
-            ],400);
+            ], 400);
         }
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred: ' . $e->getMessage(),
+            'errorCode' => 500
+        ], 500);
     }
+}
 
     /**
      * Update the specified resource in storage.
@@ -59,6 +74,7 @@ class CartController extends Controller
     {
         $cart = new Cart($request->get('steam_id'));
         $product = Product::find($request->get('product_id'));
+        $steamId = $request->get('steam_id');
 
         if(!$product) {
             return response()->json([
@@ -75,7 +91,6 @@ class CartController extends Controller
         return response()->json([
             'success' => $added,
             'message' => $added ? $message : 'Product already in cart',
-            'cart' => array_merge($cart->getCart()->toArray(), $product->toArray()),
             'total' => $cart->getTotalPrice()
         ],$added ? 200 : 400);
     }

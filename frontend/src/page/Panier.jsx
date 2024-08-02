@@ -1,26 +1,31 @@
-import React, { useState } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import React, { useState, useEffect } from 'react';
 import CartItem from '../components/CartItem';
+import CartService from '../services/cartService';
 import '../index.css';
 
 const Panier = () => {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: 'AWP | Dragon Lore Factory new',
-      price: 10000,
-      skin: {
-        image: 'https://raw.githubusercontent.com/ByMykel/counter-strike-image-tracker/main/static/panorama/images/econ/default_generated/weapon_awp_cu_medieval_dragon_awp_light_png.png'
-      },
-    },
-  ]);
+  const [cartItems, setCartItems] = useState([]);
 
-  const handleRemove = (id) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
+  useEffect(() => {
+    const fetchedCartItems = CartService.getCart();
+    setCartItems(fetchedCartItems);
+  }, []);
+
+  const handleRemove = async (id) => {
+    const updatedCartItems = cartItems.filter(item => item.id !== id);
+    setCartItems(updatedCartItems);
+
+    localStorage.setItem('cart', JSON.stringify(updatedCartItems));
+
+    const steamId = localStorage.getItem('steam_id');
+    const response = await CartService.removeItem(id);
+
+    if (!response.success) {
+      console.error('Failed to remove item from database:', response.message);
+    }
   };
 
-  const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const totalPrice = cartItems.reduce((total, item) => total + item.price, 0);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -35,7 +40,6 @@ const Panier = () => {
           <div className="text-2xl font-bold">Total : {totalPrice} $</div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

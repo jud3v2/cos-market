@@ -25,7 +25,6 @@ Route::get('/admin/users', [AdminAuthController::class, 'getAllUsers']);
 Route::get('steam/login', [SteamAuthController::class, 'loginWithSteam']);
 Route::get('steam/callback', [SteamAuthController::class, 'steamCallback'])->name('steam.callback');
 
-
 Route::resource('skin', SkinController::class)->except(['create', 'edit']);
 Route::resource('agent', AgentsController::class)->except(['create', 'edit']);
 Route::resource('collectible', CollectibleController::class)->except(['create', 'edit']);
@@ -39,7 +38,7 @@ Route::resource('stickers', StickersController::class)->except(['create', 'edit'
 Route::resource('product', ProductController::class)->except(['create', 'edit']);
 Route::resource('cart', CartController::class)->except(['create', 'edit']);
 
-Route::get('/cart-remove/', [CartController::class, 'remove']);
+Route::get('/cart-remove/', [CartController::class, 'remove'])->name('cart-remove');
 /* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
     return $request->user();
 }); */

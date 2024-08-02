@@ -43,16 +43,14 @@ class Cart
         $this->products[] = $product;
         return true;
     }
-
     public function removeProduct(Product $product): bool
     {
-        foreach ($this->products as $key => $p) {
-            if ($p->id === $product->id) {
-                unset($this->products[$key]);
-                return true;
-            }
-        }
-        return false;
+        $newCart = array_filter($this->products, function ($p) use ($product) {
+            return $p->id !== $product->id;
+        });
+
+        $this->products = $newCart;
+        return true;
     }
 
     public function emptyCart(): void
