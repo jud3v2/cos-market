@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AgentsController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BulletCoinController;
 use App\Http\Controllers\CollectibleController;
 use App\Http\Controllers\CollectionsController;
 use App\Http\Controllers\CratesController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\StickersController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\SteamAuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 //ROUTE ADMIN
@@ -38,6 +40,8 @@ Route::resource('patches', PatchesController::class)->except(['create', 'edit'])
 Route::resource('stickers', StickersController::class)->except(['create', 'edit']);
 Route::resource('product', ProductController::class)->except(['create', 'edit']);
 Route::resource('cart', CartController::class)->except(['create', 'edit']);
+Route::resource('bulletcoin', BulletCoinController::class)->except(['create', 'edit', 'index', 'destroy']);
+Route::resource('transaction', TransactionController::class)->except(['create', 'edit', 'update', 'destroy']);
 
 Route::get('/cart-remove/', [CartController::class, 'remove']);
 /* Route::middleware('auth.jwt')->get('/user', function (Request $request) {

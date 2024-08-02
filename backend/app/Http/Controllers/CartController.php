@@ -75,7 +75,6 @@ class CartController extends Controller
         return response()->json([
             'success' => $added,
             'message' => $added ? $message : 'Product already in cart',
-            'cart' => array_merge($cart->getCart()->toArray(), $product->toArray()),
             'total' => $cart->getTotalPrice()
         ],$added ? 200 : 400);
     }
@@ -101,7 +100,6 @@ class CartController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Product removed from cart',
-                'cart' => $cart->getCart(),
                 'total' => $cart->getTotalPrice()
             ]);
         } else {
