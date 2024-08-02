@@ -79,6 +79,7 @@ const ProductDetail = () => {
       <div className="flex flex-col md:flex-row">
         <div className="flex-1">
           <img src={item.image} alt={item.name} className="mb-4 max-w-full" />
+          <span className="text-lg font-semibold text-gray-900">Prix : {price} $</span>
         </div>
         <div className="flex-1 ml-0 md:ml-4">
           <div className="mb-4">
@@ -107,14 +108,18 @@ const ProductDetail = () => {
             })}
           </div>
           <div className="mb-4">
-            <span className="font-bold">Usure minimale :</span> {min_float}
+            <div className="grid grid-cols-3 gap-4">
+
+              <div className="font-bold">Usure minimale</div>
+              <div className="font-bold">Usure maximale</div>
+              <div className="font-bold">Usure</div>
+
+              <div>{min_float}</div>
+              <div>{max_float}</div>
+              <div>{product.usage}</div>
+            </div>
           </div>
-          <div className="mb-4">
-            <span className="font-bold">Usure maximale :</span> {max_float}
-          </div>
-          <div className="mb-4">
-            <span className="font-bold">Usure :</span> {product.usage}
-          </div>
+
           <div className="mb-4">
             <h3 className='font-bold text-2xl'>Caisse : </h3>
             <div className="max-h-24 overflow-y-auto" ref={scrollRef}>
