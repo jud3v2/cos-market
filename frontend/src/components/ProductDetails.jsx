@@ -79,12 +79,14 @@ const ProductDetail = () => {
       <div className="flex flex-col md:flex-row">
         <div className="flex-1">
           <img src={item.image} alt={item.name} className="mb-4 max-w-full" />
-          <span className="text-lg font-semibold text-gray-900">Prix : {price} $</span>
+          <div className="items-center mb-4">
+            <button className="bg-yellow-400 hover:bg-orange-400 text-white font-bold py-2 px-52 rounded">
+              Ajouter au panier
+            </button>
+          </div>
+            <span className="text-lg font-semibold text-gray-900">Prix : {price} $</span>
         </div>
         <div className="flex-1 ml-0 md:ml-4">
-          <div className="mb-4">
-            <span className='font-bold'>Description : </span>{description}
-          </div>
           <div className="mb-4">
             <span className="font-bold">Arme :</span> {item.name}
           </div>
@@ -107,22 +109,19 @@ const ProductDetail = () => {
               )
             })}
           </div>
-          <div className="mb-4">
-            <div className="grid grid-cols-3 gap-4">
-
-              <div className="font-bold">Usure minimale</div>
-              <div className="font-bold">Usure maximale</div>
-              <div className="font-bold">Usure</div>
-
-              <div>{min_float}</div>
-              <div>{max_float}</div>
-              <div>{product.usage}</div>
+          <div className="mb-4 text-center">
+            <div className="grid grid-cols-3 border border-gray-300">
+              <div className="font-bold border-r border-b border-gray-300 p-2">Usure minimale</div>
+              <div className="font-bold border-r border-b border-gray-300 p-2">Usure maximale</div>
+              <div className="font-bold border-b border-gray-300 p-2">Usure</div>
+              <div className="border-r border-gray-300 p-2">{min_float}</div>
+              <div className="border-r border-gray-300 p-2">{max_float}</div>
+              <div className="p-2">{product.usage}</div>
             </div>
           </div>
-
           <div className="mb-4">
             <h3 className='font-bold text-2xl'>Caisse : </h3>
-            <div className="max-h-24 overflow-y-auto" ref={scrollRef}>
+            <div className="max-h-32 overflow-y-auto" ref={scrollRef}>
               {JSON.parse(JSON.parse(item.crates))?.map(crate => {
                 return (
                   <div key={crate.name} className="mb-2">
