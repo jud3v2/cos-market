@@ -2,6 +2,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .scoreboard {
@@ -17,18 +20,25 @@
 
 .target {
     position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
     cursor: pointer;
     user-select: none;
 }
 
 .target.normal {
-    color: blue;
+    background-color: blue;
 }
 
 .target.golden {
-    color: gold;
+    background-color: gold;
 }
 
 .target.red {
-    color: red;
+    background-color: red;
+}
+
+.target.orange {
+    background-color: orange;
 }
