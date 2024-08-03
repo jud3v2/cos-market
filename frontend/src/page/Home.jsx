@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Card from '../components/Card';
 import Title from '../components/Title';
 import '../index.css';
+import Loading from "../components/Loading.jsx";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -34,7 +35,7 @@ const Home = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading message={"Bienvenue Chez CosMarket"} />;
   }
 
   if (error) {

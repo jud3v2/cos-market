@@ -31,10 +31,12 @@ const Panier = () => {
     <div className="flex flex-col min-h-screen">
       <main className="flex-grow bg-gray-100 p-6">
         <h1 className="text-3xl font-bold mb-4">Panier</h1>
-        <div className="grid grid-cols-1 gap-6">
-          {cartItems.map(item => (
-            <CartItem key={item.id} item={item} onRemove={handleRemove} />
-          ))}
+        <div className="flex w-full mx-auto justify-center">
+          <div className="grid grid-cols-2 gap-6">
+            {cartItems.map(item => (
+                <CartItem key={item.id} item={item} onRemove={handleRemove}/>
+            ))}
+          </div>
         </div>
         <div className="flex justify-end mt-4">
           <div className="text-2xl font-bold">Total : {totalPrice} $</div>

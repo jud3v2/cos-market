@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Loading from "../components/Loading.jsx";
 
 const SteamLoginSuccess = () => {
     const location = useLocation();
@@ -28,7 +29,7 @@ const SteamLoginSuccess = () => {
     }, [location, navigate]);
 
     if (!user) {
-        return <div>Loading...</div>;
+        return <Loading message={'Chargement de votre profil'} />;
     }
 
     return (

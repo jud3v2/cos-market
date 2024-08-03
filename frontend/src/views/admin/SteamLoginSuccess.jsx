@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Loading from "../../components/Loading.jsx";
 
 const SteamLoginSuccess = () => {
     const location = useLocation();
@@ -14,7 +15,7 @@ const SteamLoginSuccess = () => {
         }
     }, [location, navigate]);
 
-    return <div>Loading...</div>;
+    return <Loading message={"Connexion en cours..."} />;
 };
 
 export default SteamLoginSuccess;
