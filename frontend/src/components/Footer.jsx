@@ -16,6 +16,7 @@ const Footer = () => {
           <h4 className="font-bold pb-5">Soutien</h4>
           <a href="#">Commision de vente</a>
           <a href="#">Contact</a>
+          <a href="/cos-aim-lab">CosAimLab</a>
         </div>
         <div className="text-center mb-4 sm:mb-0">
           <h4 className="font-bold pb-5">Payez en toute sécurité avec</h4>

@@ -1,0 +1,34 @@
+.game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.scoreboard {
+    margin-bottom: 20px;
+}
+
+.targets {
+    width: 100%;
+    height: 80vh;
+    position: relative;
+    border: 1px solid #000;
+}
+
+.target {
+    position: absolute;
+    cursor: pointer;
+    user-select: none;
+}
+
+.target.normal {
+    color: blue;
+}
+
+.target.golden {
+    color: gold;
+}
+
+.target.red {
+    color: red;
+}

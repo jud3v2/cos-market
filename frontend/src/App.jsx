@@ -13,6 +13,7 @@ import ProductDetails from './components/ProductDetails';
 import './App.css';
 import ReactToastify from "./components/ReactToastify.jsx";
 import SteamLogin from "./views/SteamLogin.jsx";
+import CosAimLAb from "./page/CosAimLab.jsx";
 
 function App() {
   const isAuthenticated = localStorage.getItem('token') !== null;
@@ -39,6 +40,7 @@ function App() {
                       <Route path="/" element={Layout(Home, ClientLayout, {}, {})} />
                       <Route path="/produits" element={Layout(Products, ClientLayout, {}, {})} />
                       <Route path="/panier" element={Layout(Panier, ClientLayout,  {}, {})} />
+                      <Route path="/cos-aim-lab" element={Layout(CosAimLAb, ClientLayout,  {}, {})} />
                       <Route path="/admin/login" element={Layout(LoginAdmin)} />
                       <Route path="/admin/panel" element={adminProtectedRoute(AdminPanel)} />
                       <Route path="/admin/clients" element={adminProtectedRoute(Clients)} />
