@@ -4,9 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  font-family: 'Luckiest Guy', cursive;
+}
+
 .nav-item {
   @apply text-black font-bold;
-  font-family: 'Luckiest Guy', cursive;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
   font-size: 1.5rem;
   margin: 0.5rem;

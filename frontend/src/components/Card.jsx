@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../index.css';
 
 const Card = ({ product }) => {
   const { id, name, price, skin } = product;

@@ -1,6 +1,7 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 
+
 const CartItem = ({ item, onRemove }) => {
   const { name, price, skin, quantity } = item;
   const imageUrl = skin?.image || 'default-image.png';
@@ -13,7 +14,7 @@ const CartItem = ({ item, onRemove }) => {
       <div className="w-3/4 px-6 py-4 flex flex-col justify-between">
         <div>
           <div className="font-bold text-xl mb-2">{name}</div>
-          
+
         </div>
         <div className="flex justify-between items-center mt-2 border-t pt-2">
           <span className="text-lg font-semibold text-gray-900">{price} $</span>

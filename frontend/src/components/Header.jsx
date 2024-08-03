@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import logo from '../assets/logo/logo_skinharem.png';
+import logo from '../assets/logo/logo_cosmarket.png';
 import '../index.css';
 
 const Header = () => {
@@ -18,7 +18,7 @@ const Header = () => {
           }}
       >
         <nav className="flex flex-col sm:flex-row items-center justify-center sm:justify-around">
-          <img src={logo} alt="Skin Harem Logo" className="h-32 drop-shadow-xl sm:order-2 order-1" />
+          <img src={logo} alt="Skin Harem Logo" className="h-24 drop-shadow-xl sm:order-2 order-1" />
           <div className="flex flex-col xl:gap-32 lg:gap-20 lg:flex-row md:flex-col sm:flex-rcol items-center order-2 sm:order-1 sm:space-x-6">
             <a href="/" className={getNavItemClass('/')}>ACCUEIL</a>
             <a href="/produits" className={getNavItemClass('/produits')}>PRODUITS</a>
