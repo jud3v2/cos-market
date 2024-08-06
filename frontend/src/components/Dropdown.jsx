@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const Dropdown = ({ label, options }) => {
+const Dropdown = ({ label, options, onChange }) => { // Ajout de onChange comme prop
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef(null);
@@ -21,6 +21,11 @@ const Dropdown = ({ label, options }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [dropdownRef]);
+
+  const handleOptionClick = (option) => {
+    onChange(option);
+    setIsOpen(false);
+  };
 
   return (
       <div ref={dropdownRef} className="relative inline-block text-left">
@@ -50,6 +55,10 @@ const Dropdown = ({ label, options }) => {
                     <a
                         key={option}
                         href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleOptionClick(option);
+                        }}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       {option}

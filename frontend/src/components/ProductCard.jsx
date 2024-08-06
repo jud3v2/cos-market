@@ -1,11 +1,9 @@
 import React from 'react';
 import CartService from '../services/cartService';
-import { getSteamId } from '../utils/getSteamId'; // Importez la fonction ici
 import { Link } from 'react-router-dom';
 import {toast} from "react-toastify";
 
 const ProductCard = ({ product }) => {
-  const steamId = getSteamId(); // Récupérez le steam_id ici
   const { name, price, skin, created_at, id } = product;
   const imageUrl = skin?.image || 'default-image.png';
   const rarity = skin?.rarity?.name || 'Rareté non disponible';
