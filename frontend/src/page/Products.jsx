@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import ProductCard from '../components/ProductCard';
 import Dropdown from '../components/Dropdown';
-import '../index.css';
 import Loading from "../components/Loading.jsx";
+import { Slider } from '@mui/material'; // Import MUI Slider
+import '../index.css';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -13,6 +14,8 @@ const Products = () => {
   const [selectedSkin, setSelectedSkin] = useState('');
   const [skinOptions, setSkinOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
+  const [priceRange, setPriceRange] = useState([0, 10000]); // Default range
+  const [maxPrice, setMaxPrice] = useState(10000); // Separate state for max price
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -26,6 +29,11 @@ const Products = () => {
         setProducts(fetchedProducts);
         setSkinOptions(['Tout afficher', ...Array.from(skins)]);
         setCategoryOptions(['Tout afficher', ...Array.from(categories)]);
+
+        // Calculate the maximum price from the fetched products
+        const maxPrice = Math.max(...fetchedProducts.map(product => product.price), 0);
+        setMaxPrice(maxPrice); // Set the max price
+        setPriceRange([0, maxPrice]); // Set the price range to [0, maxPrice]
       } catch (error) {
         console.error('Error fetching products:', error);
         setError(error);
@@ -101,40 +109,26 @@ const Products = () => {
               options={skinOptions}
               onChange={handleSkinChange}
             />
-            <Dropdown label="PRIX" options={['Prix 1', 'Prix 2', 'Prix 3']}/>
+            <Dropdown
+              label="PRIX"
+              isPriceDropdown={true}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              maxPrice={maxPrice}
+            />
+            <Dropdown label="AFFICHAGE" options={['Affi 1', 'Affi 2', 'Affi 3']}/>
           </div>
-          <Dropdown label="AFFICHAGE" options={['Affi 1', 'Affi 2', 'Affi 3']}/>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {products
             .filter(product => {
-              const skin = product.skin;
-              const categoryString = skin?.category;
-              const weaponsString = skin?.weapons;
-              let category = null;
-              let weapon = null;
-
-              if (categoryString) {
-                try {
-                  category = JSON.parse(categoryString);
-                } catch (error) {
-                  console.error('Error parsing category:', error);
-                }
-              }
-
-              if (weaponsString) {
-                try {
-                  weapon = JSON.parse(weaponsString);
-                } catch (error) {
-                  console.error('Error parsing weapons:', error);
-                }
-              }
-
               const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-              const matchesCategory = selectedCategory ? category?.name.toLowerCase() === selectedCategory.toLowerCase() : true;
-              const matchesSkin = selectedSkin ? weapon?.name.toLowerCase() === selectedSkin.toLowerCase() : true;
+              const matchesCategory = selectedCategory ? product.category.toLowerCase() === selectedCategory.toLowerCase() : true;
+              const matchesSkin = selectedSkin ? product.skin.toLowerCase() === selectedSkin.toLowerCase() : true;
+              const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
 
-              return matchesSearch && matchesCategory && matchesSkin;
+              return matchesSearch && matchesCategory && matchesSkin && matchesPrice;
             })
             .map(product => (
               <ProductCard key={product.id} product={product}/>
