@@ -3,6 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { incrementScore, incrementBulletCoin, decrementLives, incrementGameSpeed } from '../store/gameSlice';
 import { motion } from 'framer-motion';
 import Loading from "../components/Loading.jsx";
+import axios from 'axios';
+import {toast} from "react-toastify";
+import {jwtDecode} from "jwt-decode";
 
 const Game = () => {
     const dispatch = useDispatch();
@@ -10,20 +13,84 @@ const Game = () => {
 
     const [targets, setTargets] = useState([]);
     const [user, setUser] = useState(null);
+    const [gameStarted, setGameStarted] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [buttonLoading, setButtonLoading] = useState(false);
+
     const [attempts, setAttempts] = useState(() => {
         const savedAttempts = localStorage.getItem('attempts');
-        return savedAttempts ? JSON.parse(savedAttempts) : 3;
+        return savedAttempts ? JSON.parse(savedAttempts) : 0;
     });
+
+    const [dateResetAttempt, setDateResetAttempt] = useState(() => {
+        const savedDateResetAttempt = localStorage.getItem('dateResetAttempt');
+        return savedDateResetAttempt ? JSON.parse(savedDateResetAttempt) : new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours
+    });
+
+    const makeDeposit = async () => {
+        const loading = toast.loading("Dépôt de vos bullet coins en cours...");
+        setButtonLoading(true);
+        try {
+            // Fetch bullet coin table here
+            const btDataResponse = await axios.post('/bulletcoin/', { user_id: user.id });
+            const btData = btDataResponse.data;
+            console.log('bulletcoin data fetched');
+
+            // Create a new transaction
+            const ctResponse = await axios.post('/transaction', {
+                user_id: user.id,
+                type: 'deposit',
+                amount: bulletCoin <= 50 ? bulletCoin : 50,
+            });
+            const ct = ctResponse.data;
+            console.log('transaction created');
+
+            const bcId = btData.id;
+            const transactionId = ct.transaction_id;
+
+            // Make a deposit
+            await axios.put(`/bulletcoin/${bcId}`, {
+                user_id: user.id,
+                amount: bulletCoin <= 50 ? bulletCoin : 50,
+                description: 'Deposit from game',
+                status: "confirmed",
+                transaction_id: transactionId,
+                type: "deposit"
+            })
+                .then(() => {
+                    console.log('deposit made');
+                    toast.success("Vos bullet coins ont été déposés avec succès");
+                    setTimeout(() => {
+                        window.location.reload();
+                        setButtonLoading(false);
+                    }, 1500);
+                })
+                .catch((error) => {
+                    console.error(error);
+                    toast.error("Une erreur est survenue lors de la récupération de vos bullet coins");
+                })
+                .finally(() => toast.dismiss(loading));
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     useEffect(() => {
         localStorage.setItem('attempts', JSON.stringify(attempts));
     }, [attempts]);
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
-            setUser(user);
+        const t = localStorage.getItem('token') || null;
+        if (t) {
+            const token = jwtDecode(t);
+            if (token) {
+                setUser(token.user);
+            }
+        }  else {
+            toast("Vous devez être connecté pour jouer", { type: "error" });
+            setTimeout(() => {
+                window.location.href = '/steam/login';
+            }, 1500)
         }
 
         setTimeout(() => {
@@ -50,6 +117,13 @@ const Game = () => {
         return () => clearInterval(dailyInterval);
     }, [dispatch]);
 
+    useEffect(() => {
+        if (lives === 0 && attempts < 3) {
+            setAttempts(attempts + 1);
+            localStorage.setItem('dateResetAttempt', JSON.stringify(dateResetAttempt));
+        }
+    }, [lives]);
+
     const handleTargetClick = (target) => {
         if (target.type === 'golden') {
             dispatch(incrementBulletCoin(1));
@@ -71,7 +145,24 @@ const Game = () => {
 
     if (loading) return <Loading />;
 
-    if(lives === 0) {
+    if (lives === 0) {
+        return (
+            <div className="game">
+                <div className="game-over">
+                    <h3 className={"my-5 text-lg"}>Game Over</h3>
+                    <p>Score: {score}</p>
+                    <p>Bullet Coins: {bulletCoin}</p>
+                    <p>Essaie restant: {3 - attempts}</p>
+                    <button className={"bg-yellow-500 hover:bg-yellow-700 text-white rounded p-2"} onClick={() => window.location.reload()}>Rejouer</button>
+                    {bulletCoin > 0 && (
+                        <button className={"bg-yellow-500 hover:bg-yellow-700 text-white rounded p-2"} onClick={async () => await makeDeposit()}>Récupérer mes bullet coins</button>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
+    if (!gameStarted) {
         return (
             <div className="game">
                 <div className="scoreboard">
@@ -79,29 +170,40 @@ const Game = () => {
                     <p>Bullet Coins: {bulletCoin}</p>
                     <p>Lives: {lives}</p>
                 </div>
-                <div className="game-over">
-                    <p>Game Over</p>
-                    <p>Score: {score}</p>
-                    <p>Bullet Coins: {bulletCoin}</p>
-                    <p>Attempts Left: {attempts}</p>
-                    <button onClick={() => window.location.reload()}>Play Again</button>
-                    {attempts > 0 && (
-                        <button onClick={() => window.location.reload()}>Claim my Bullet Coin(s)</button>
-                        )
-                    }
+                <div className="game-start">
+                    <p>Bienvenue dans le jeu cos aim lab</p>
+                    <p>Vos essaies effectué aujourd'hui: {attempts}</p>
+                    <button className={"bg-yellow-500 hover:bg-yellow-700 text-white rounded p-2"} disabled={buttonLoading} onClick={() => setGameStarted(true)}>Commencer le jeu</button>
                 </div>
             </div>
         );
     }
 
-    console.log(gameSpeed, bulletCoin, score, lives)
+    if (attempts >= 3) {
+        const hours = Math.floor((dateResetAttempt - new Date().getTime()) / (60 * 60 * 1000));
+        const minutes = Math.floor((dateResetAttempt - new Date().getTime()) / (60 * 1000) % 60);
+        const seconds = Math.floor((dateResetAttempt - new Date().getTime()) / 1000 % 60);
+
+        return (
+            <div className="game">
+                <div className="scoreboard">
+                    <h3 className={"text-2xl my-5"}>Oops !</h3>
+                </div>
+                <div className="game-start">
+                    <p>Vous avez utilisé tous vos essais du jour</p>
+                    <p>Vous pourrez rejouer dans: {hours} heures {minutes} minutes {seconds} secondes</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="game">
             <div className="scoreboard">
                 <p>Score: {score}</p>
                 <p>Bullet Coins: {bulletCoin}</p>
-                <p>Lives: {lives}</p>
+                <p>Vie restante(s): {lives}</p>
+                <p>Vitesse du jeu x {gameSpeed.toPrecision(2)}</p>
             </div>
             <div className="targets">
                 {targets.map((target) => (
