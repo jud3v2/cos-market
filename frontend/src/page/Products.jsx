@@ -8,6 +8,7 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetch('http://127.0.0.1:8000/api/product')
@@ -48,7 +49,10 @@ const Products = () => {
                     <main className="flex-grow bg-gray-100 p-6">
                             <div className="flex justify-between items-center mb-4">
                                     <input type="text" placeholder="Rechercher..."
-                                           className="p-2 border rounded w-full max-w-xs"/>
+                                           className="p-2 border rounded w-full max-w-xs"
+                                           value={searchTerm}
+                                           onChange={(e) => setSearchTerm(e.target.value)}
+                                           />
                                     <div className="flex space-x-4">
                                             <Dropdown label="ARMES" options={['Arme 1', 'Arme 2', 'Arme 3']}/>
                                             <Dropdown label="SKINS" options={['Skins 1', 'Skins2', 'Skins 3']}/>
@@ -57,7 +61,9 @@ const Products = () => {
                                     <Dropdown label="AFFICHAGE" options={['Affi 1', 'Affi 2', 'Affi 3']}/>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {products.map(product => (
+                                    {products
+                                    .filter(product => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                                    .map(product => (
                                         <ProductCard key={product.id} product={product}/>
                                     ))}
                             </div>
