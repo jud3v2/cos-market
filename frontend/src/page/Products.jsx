@@ -10,32 +10,73 @@ const Products = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedSkin, setSelectedSkin] = useState('');
+  const [skinOptions, setSkinOptions] = useState([]);
 
   useEffect(() => {
     fetch('http://127.0.0.1:8000/api/product')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log(data);
-          if (Array.isArray(data)) {
-            setProducts(data);
-          } else if (Array.isArray(data.products)) {
-            setProducts(data.products);
-          } else {
-            setError(new Error('Invalid API response structure'));
-          }
-          setLoading(false);
-        })
-        .catch(error => {
-          console.error('Error fetching products:', error);
-          setError(error);
-          setLoading(false);
-        });
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setProducts(data);
+          // Extraire les options de skins
+          const skins = new Set();
+          data.forEach(product => {
+            const skin = product.skin;
+            const weaponsString = skin?.weapons;
+            if (weaponsString) {
+              try {
+                const weapon = JSON.parse(weaponsString);
+                skins.add(weapon.name);
+              } catch (error) {
+                console.error('Error parsing weapons:', error);
+              }
+            }
+          });
+          const skinArray = Array.from(skins);
+          setSkinOptions(['Tout afficher', ...skinArray]);
+        } else if (Array.isArray(data.products)) {
+          setProducts(data.products);
+          // Extraire les options de skins
+          const skins = new Set();
+          data.products.forEach(product => {
+            const skin = product.skin;
+            const weaponsString = skin?.weapons;
+            if (weaponsString) {
+              try {
+                const weapon = JSON.parse(weaponsString);
+                skins.add(weapon.name);
+              } catch (error) {
+                console.error('Error parsing weapons:', error);
+              }
+            }
+          });
+          const skinArray = Array.from(skins);
+          setSkinOptions(['Tout afficher', ...skinArray]);
+        } else {
+          setError(new Error('Invalid API response structure'));
+        }
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching products:', error);
+        setError(error);
+        setLoading(false);
+      });
   }, []);
+
+  const handleSkinChange = (value) => {
+    if (value === 'Tout afficher') {
+      setSelectedSkin('');
+    } else {
+      setSelectedSkin(value);
+    }
+  };
 
   if (loading) {
     return <Loading message={"Chargement des produits disponible"}/>;
@@ -62,7 +103,11 @@ const Products = () => {
               options={['', 'Pistols', 'Rifles', 'SMGs', 'Heavy', 'Knives', 'Gloves']}
               onChange={(value) => setSelectedCategory(value)}
             />
-            <Dropdown label="SKINS" options={['Skins 1', 'Skins 2', 'Skins 3']}/>
+            <Dropdown
+              label="SKINS"
+              options={skinOptions}
+              onChange={handleSkinChange}
+            />
             <Dropdown label="PRIX" options={['Prix 1', 'Prix 2', 'Prix 3']}/>
           </div>
           <Dropdown label="AFFICHAGE" options={['Affi 1', 'Affi 2', 'Affi 3']}/>
@@ -71,8 +116,10 @@ const Products = () => {
           {products
             .filter(product => {
               const skin = product.skin;
-              const categoryString = skin.category;
+              const categoryString = skin?.category;
+              const weaponsString = skin?.weapons;
               let category = null;
+              let weapon = null;
 
               // Vérifier si la chaîne de catégorie est définie et non vide
               if (categoryString) {
@@ -83,8 +130,20 @@ const Products = () => {
                 }
               }
 
-              return product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-                (selectedCategory ? category && category.name.toLowerCase() === selectedCategory.toLowerCase() : true); // Vérifier si category est défini
+              // Vérifier si la chaîne de weapons est définie et non vide
+              if (weaponsString) {
+                try {
+                  weapon = JSON.parse(weaponsString);
+                } catch (error) {
+                  console.error('Error parsing weapons:', error);
+                }
+              }
+
+              const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+              const matchesCategory = selectedCategory ? category?.name.toLowerCase() === selectedCategory.toLowerCase() : true;
+              const matchesSkin = selectedSkin ? weapon?.name.toLowerCase() === selectedSkin.toLowerCase() : true;
+
+              return matchesSearch && matchesCategory && matchesSkin;
             })
             .map(product => (
               <ProductCard key={product.id} product={product}/>
