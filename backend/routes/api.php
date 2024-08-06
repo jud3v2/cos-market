@@ -43,6 +43,7 @@ Route::resource('bulletcoin', BulletCoinController::class)->except(['create', 'e
 Route::resource('transaction', TransactionController::class)->except(['create', 'edit', 'update', 'destroy']);
 
 Route::get('/cart-remove/', [CartController::class, 'remove'])->name('cart-remove');
+Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTransaction']);
 /* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
     return $request->user();
 }); */

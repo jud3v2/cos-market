@@ -26,9 +26,9 @@ class BulletCoinController extends Controller
         }
 
         // check if the user has already been assigned a bullet coin
-
-        if($b = BulletCoin::where('user_id', $request->user_id)->first() !== null) {
-            return response()->json(['message' => 'User already has a bullet coin field', 'bulletcoin' => $b], 400);
+        $b = BulletCoin::where('user_id', $request->user_id)->first();
+        if($b !== null) {
+            return response()->json($b, 200);
         }
 
         $bulletCoin->user_id = $request->user_id;
@@ -49,7 +49,7 @@ class BulletCoinController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update($id, Request $request): JsonResponse
     {
         $data = $request->validate([
             'amount' => 'required|integer',
@@ -79,16 +79,13 @@ class BulletCoinController extends Controller
             return response()->json(['message' => 'Bullet coin not found'], 404);
         }
 
-        $bulletCoin->amount = $data['amount'];
-        $bulletCoin->user_id = $data['user_id'];
-
         if($bulletCoin->amount < 0) {
             return response()->json(['message' => 'Amount must be greater than 0'], 400);
         }
 
-        if($data['type'] === 'withdraw' && $bulletCoin->amount > 0) {
+        if($data['type'] === 'withdraw' && $data > 0) {
             $bulletCoin->amount = $bulletCoin->amount - $data['amount']; // withdraw
-        } elseif($data['type'] === 'deposit' && $bulletCoin->amount > 0) {
+        } elseif($data['type'] === 'deposit' && $data > 0) {
             $bulletCoin->amount = $bulletCoin->amount + $data['amount']; // deposit
         } else {
             return response()->json(['message' => 'Invalid transaction type'], 400);

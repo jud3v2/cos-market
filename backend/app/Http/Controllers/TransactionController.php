@@ -60,4 +60,9 @@ class TransactionController extends Controller
             'amount' => $transaction->amount,
         ]);
     }
+
+    public function getLastTransaction($id): JsonResponse
+    {
+        return response()->json(Transaction::where('user_id', $id)->orderBy('created_at', 'desc')->first());
+    }
 }
