@@ -12,79 +12,72 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSkin, setSelectedSkin] = useState('');
   const [skinOptions, setSkinOptions] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/product')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (Array.isArray(data)) {
-          setProducts(data);
-          // Extraire les options de skins
-          const skins = new Set();
-          data.forEach(product => {
-            const skin = product.skin;
-            const weaponsString = skin?.weapons;
-            if (weaponsString) {
-              try {
-                const weapon = JSON.parse(weaponsString);
-                skins.add(weapon.name);
-              } catch (error) {
-                console.error('Error parsing weapons:', error);
-              }
-            }
-          });
-          const skinArray = Array.from(skins);
-          setSkinOptions(['Tout afficher', ...skinArray]);
-        } else if (Array.isArray(data.products)) {
-          setProducts(data.products);
-          // Extraire les options de skins
-          const skins = new Set();
-          data.products.forEach(product => {
-            const skin = product.skin;
-            const weaponsString = skin?.weapons;
-            if (weaponsString) {
-              try {
-                const weapon = JSON.parse(weaponsString);
-                skins.add(weapon.name);
-              } catch (error) {
-                console.error('Error parsing weapons:', error);
-              }
-            }
-          });
-          const skinArray = Array.from(skins);
-          setSkinOptions(['Tout afficher', ...skinArray]);
-        } else {
-          setError(new Error('Invalid API response structure'));
-        }
-        setLoading(false);
-      })
-      .catch(error => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/product');
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const data = await response.json();
+        const { products: fetchedProducts, skins, categories } = processProducts(data);
+
+        setProducts(fetchedProducts);
+        setSkinOptions(['Tout afficher', ...Array.from(skins)]);
+        setCategoryOptions(['Tout afficher', ...Array.from(categories)]);
+      } catch (error) {
         console.error('Error fetching products:', error);
         setError(error);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchProducts();
   }, []);
 
-  const handleSkinChange = (value) => {
-    if (value === 'Tout afficher') {
-      setSelectedSkin('');
-    } else {
-      setSelectedSkin(value);
-    }
+  const processProducts = (data) => {
+    const productsArray = Array.isArray(data) ? data : data.products || [];
+    const skins = new Set();
+    const categories = new Set();
+
+    productsArray.forEach(product => {
+      const skin = product.skin;
+      const weaponsString = skin?.weapons;
+      const categoryString = skin?.category;
+
+      if (weaponsString) {
+        try {
+          const weapon = JSON.parse(weaponsString);
+          skins.add(weapon.name);
+        } catch (error) {
+          console.error('Error parsing weapons:', error);
+        }
+      }
+      if (categoryString) {
+        try {
+          const category = JSON.parse(categoryString);
+          categories.add(category.name);
+        } catch (error) {
+          console.error('Error parsing category:', error);
+        }
+      }
+    });
+
+    return { products: productsArray, skins, categories };
   };
 
-  if (loading) {
-    return <Loading message={"Chargement des produits disponible"}/>;
-  }
+  const handleSkinChange = (value) => {
+    setSelectedSkin(value === 'Tout afficher' ? '' : value);
+  };
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
+  const handleCategoryChange = (value) => {
+    setSelectedCategory(value === 'Tout afficher' ? '' : value);
+  };
+
+  if (loading) return <Loading message={"Chargement des produits disponible"}/>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -100,8 +93,8 @@ const Products = () => {
           <div className="flex space-x-4">
             <Dropdown
               label="TYPE D'ARMES"
-              options={['', 'Pistols', 'Rifles', 'SMGs', 'Heavy', 'Knives', 'Gloves']}
-              onChange={(value) => setSelectedCategory(value)}
+              options={categoryOptions}
+              onChange={handleCategoryChange}
             />
             <Dropdown
               label="SKINS"
@@ -121,7 +114,6 @@ const Products = () => {
               let category = null;
               let weapon = null;
 
-              // Vérifier si la chaîne de catégorie est définie et non vide
               if (categoryString) {
                 try {
                   category = JSON.parse(categoryString);
@@ -130,7 +122,6 @@ const Products = () => {
                 }
               }
 
-              // Vérifier si la chaîne de weapons est définie et non vide
               if (weaponsString) {
                 try {
                   weapon = JSON.parse(weaponsString);
