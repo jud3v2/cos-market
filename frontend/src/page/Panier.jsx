@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CartItem from '../components/CartItem';
 import CartService from '../services/cartService';
 import '../index.css';
+import {Link} from "react-router-dom";
 
 const Panier = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -39,6 +40,12 @@ const Panier = () => {
           </div>
         </div>
         <div className="flex justify-end mt-4">
+          <div className={'flex-1'}>
+            <Link to={'/checkout'} onClick={() => {}} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              {/*TODO: Enregister les data du panier en tant que commandes */}
+                Allez sur la page de paiement
+            </Link>
+          </div>
           <div className="text-2xl font-bold">Total : {totalPrice} $</div>
         </div>
       </main>
