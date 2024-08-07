@@ -121,6 +121,11 @@ const Game = () => {
         if (lives === 0 && attempts < 3) {
             setAttempts(attempts + 1);
             localStorage.setItem('dateResetAttempt', JSON.stringify(dateResetAttempt));
+            localStorage.setItem('attempts', JSON.stringify(attempts));
+
+            return  () => {
+                syncGame().then(r => console.log(r));
+            }
         }
     }, [lives]);
 
@@ -142,6 +147,48 @@ const Game = () => {
         if (rand < 0.3) return 'red';
         return 'normal';
     };
+
+    const syncGame = async () => {
+        const loading = toast.loading("Synchronisation du jeu en cours...");
+        try {
+            const response = await axios.post(`/sync/game/${user.id}`, {
+                game_attempts: attempts,
+                game_reset_attempts_date: String(dateResetAttempt),
+            });
+            const game = response.data;
+            setAttempts(response.data.game_attempts);
+            setDateResetAttempt(new Date(response.data.game_reset_attempts_date).getTime());
+            console.log('game synced', game);
+        } catch (error) {
+            console.error(error);
+            toast.error("Une erreur est survenue lors de la synchronisation du jeu");
+        } finally {
+            toast.dismiss(loading);
+        }
+    }
+
+    const checkIfUseCanPlay = async () => {
+        const loading = toast.loading("Vérification de vos essais en cours...");
+        try {
+            const response = await axios.get(`/sync/game/check-if-user-can-play/${user.id}`)
+                .then(res => {
+                    console.log(res.data)
+                    return res;
+                })
+            const game = response.data;
+            console.log('game fetched', game);
+
+            if (game.game_attempts >= 3) {
+                setAttempts(game.game_attempts);
+                setDateResetAttempt(game.game_reset_attempts_date);
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Une erreur est survenue lors de la vérification de vos essais");
+        } finally {
+            toast.dismiss(loading);
+        }
+    }
 
     if (loading) return <Loading />;
 
@@ -173,7 +220,12 @@ const Game = () => {
                 <div className="game-start">
                     <p>Bienvenue dans le jeu cos aim lab</p>
                     <p>Vos essaies effectué aujourd'hui: {attempts}</p>
-                    <button className={"bg-yellow-500 hover:bg-yellow-700 text-white rounded p-2"} disabled={buttonLoading} onClick={() => setGameStarted(true)}>Commencer le jeu</button>
+                    <button className={"bg-yellow-500 hover:bg-yellow-700 text-white rounded p-2"} disabled={buttonLoading} onClick={async () => {
+                        await syncGame();
+                        await checkIfUseCanPlay();
+                        setGameStarted(true);
+                        // sync game before started it
+                    }}>Commencer le jeu</button>
                 </div>
             </div>
         );

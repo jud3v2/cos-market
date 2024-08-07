@@ -9,6 +9,7 @@ import Clients from './views/admin/Clients';
 import ProtectedRoute from './components/ProtectedRoute';
 import Product from "./views/admin/Product.jsx";
 import Panier from './page/Panier';
+import Checkout from './page/Checkout';
 import ProductDetails from './components/ProductDetails';
 import './App.css';
 import ReactToastify from "./components/ReactToastify.jsx";
@@ -40,6 +41,7 @@ function App() {
                       <Route path="/" element={Layout(Home, ClientLayout, {}, {})} />
                       <Route path="/produits" element={Layout(Products, ClientLayout, {}, {})} />
                       <Route path="/panier" element={Layout(Panier, ClientLayout,  {}, {})} />
+                      <Route path="/checkout" element={Layout(Checkout, ClientLayout,  {}, {})} />
                       <Route path="/cos-aim-lab" element={Layout(CosAimLAb, ClientLayout,  {}, {})} />
                       <Route path="/admin/login" element={Layout(LoginAdmin)} />
                       <Route path="/admin/panel" element={adminProtectedRoute(AdminPanel)} />
