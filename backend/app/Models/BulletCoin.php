@@ -13,6 +13,8 @@ class BulletCoin extends Model
     protected $fillable = [
         'user_id',
         'amount',
+        'game_attempts',
+        'game_reset_attempts_date'
     ];
 
     public function user(): BelongsTo

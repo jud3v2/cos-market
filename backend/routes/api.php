@@ -10,6 +10,7 @@ use App\Http\Controllers\GraffitiController;
 use App\Http\Controllers\KeysController;
 use App\Http\Controllers\MusicKitsController;
 use App\Http\Controllers\PatchesController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SkinController;
 use App\Http\Controllers\StickersController;
@@ -44,6 +45,10 @@ Route::resource('transaction', TransactionController::class)->except(['create', 
 
 Route::get('/cart-remove/', [CartController::class, 'remove'])->name('cart-remove');
 Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTransaction']);
+Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']);
+Route::get('/sync/game/check-if-user-can-play/{id}', [BulletCoinController::class, 'checkIfUserCanPlay']);
+Route::post('/payment/create-client-secret', [PaymentController::class, 'createClientSecret']);
+
 /* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
     return $request->user();
 }); */

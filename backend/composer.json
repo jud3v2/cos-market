@@ -12,6 +12,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/telescope": "^5.1",
         "laravel/tinker": "^2.9",
+        "stripe/stripe-php": "^15.5",
         "tymon/jwt-auth": "^2.1",
         "xpaw/steam-openid": "^2.0"
     },
