@@ -46,23 +46,41 @@ const Dropdown = ({ label, options = [], onChange, isPriceDropdown, priceRange, 
         <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
             {isPriceDropdown ? (
-              <div className="px-4 py-2">
-                <Slider
-                  value={priceRange}
-                  onChange={(event, newValue) => {
-                    setPriceRange(newValue);
-                  }}
-                  valueLabelDisplay="auto"
-                  min={0}
-                  max={maxPrice}
-                  disableSwap
-                  sx={{ width: 200 }}
-                />
-                <div className="flex justify-between mt-2">
-                  <span>{`Min: ${priceRange[0]}`}</span>
-                  <span>{`Max: ${priceRange[1]}`}</span>
+              <>
+                <div className="px-4 py-2">
+                  {options.map(option => (
+                    <a
+                      key={option}
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleOptionClick(option);
+                      }}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      {option}
+                    </a>
+                  ))}
                 </div>
-              </div>
+                <div className="border-t my-2"></div>
+                <div className="px-4 py-2">
+                  <Slider
+                    value={priceRange}
+                    onChange={(event, newValue) => {
+                      setPriceRange(newValue);
+                    }}
+                    valueLabelDisplay="auto"
+                    min={0}
+                    max={maxPrice}
+                    disableSwap
+                    sx={{ width: 200 }}
+                  />
+                  <div className="flex justify-between mt-2">
+                    <span>{`Min: ${priceRange[0]}`}</span>
+                    <span>{`Max: ${priceRange[1]}`}</span>
+                  </div>
+                </div>
+              </>
             ) : (
               <>
                 <input
@@ -72,19 +90,23 @@ const Dropdown = ({ label, options = [], onChange, isPriceDropdown, priceRange, 
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                 />
-                {filteredOptions.map(option => (
-                  <a
-                    key={option}
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleOptionClick(option);
-                    }}
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    {option}
-                  </a>
-                ))}
+                {filteredOptions.length > 0 ? (
+                  filteredOptions.map(option => (
+                    <a
+                      key={option}
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleOptionClick(option);
+                      }}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      {option}
+                    </a>
+                  ))
+                ) : (
+                  <div className="px-4 py-2 text-sm text-gray-500">Aucune option disponible</div>
+                )}
               </>
             )}
           </div>

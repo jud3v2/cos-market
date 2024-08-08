@@ -8,13 +8,18 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Constantes pour le filtrage des produits par nom
   const [searchTerm, setSearchTerm] = useState('');
+  // Constantes pour le filtrage des produits par catégorie
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSkin, setSelectedSkin] = useState('');
+  // Constantes pour le filtrage des produits par type d'arme
   const [skinOptions, setSkinOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
+  // Constantes pour le filtrage des produits par prix
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [maxPrice, setMaxPrice] = useState(10000);
+  const [sortOrder, setSortOrder] = useState('asc');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -29,7 +34,6 @@ const Products = () => {
         setSkinOptions(['Tout afficher', ...Array.from(skins)]);
         setCategoryOptions(['Tout afficher', ...Array.from(categories)]);
 
-        // Calculate the maximum price from the fetched products
         const maxPrice = Math.max(...fetchedProducts.map(product => product.price), 0);
         setMaxPrice(maxPrice);
         setPriceRange([0, maxPrice]);
@@ -83,6 +87,14 @@ const Products = () => {
     setSelectedCategory(value === 'Tout afficher' ? '' : value);
   };
 
+  const handlePriceChange = (value) => {
+    setPriceRange(value);
+  };
+
+  const handleSortChange = (value) => {
+    setSortOrder(value === 'Croissant' ? 'asc' : 'desc');
+  };
+
   if (loading) return <Loading message={"Chargement des produits disponible"}/>;
   if (error) return <div>Error: {error.message}</div>;
 
@@ -104,15 +116,17 @@ const Products = () => {
               onChange={handleCategoryChange}
             />
             <Dropdown
-              label="SKINS"
+              label="ARMES"
               options={skinOptions}
               onChange={handleSkinChange}
             />
             <Dropdown
               label="PRIX"
+              options={['Croissant', 'Décroissant']}
+              onChange={handleSortChange}
               isPriceDropdown={true}
               priceRange={priceRange}
-              setPriceRange={setPriceRange}
+              setPriceRange={handlePriceChange}
               maxPrice={maxPrice}
             />
             <Dropdown label="AFFICHAGE" options={['Affi 1', 'Affi 2', 'Affi 3']}/>
@@ -150,6 +164,9 @@ const Products = () => {
               const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
 
               return matchesSearch && matchesCategory && matchesSkin && matchesPrice;
+            })
+            .sort((a, b) => {
+              return sortOrder === 'asc' ? a.price - b.price : b.price - a.price;
             })
             .map(product => (
               <ProductCard key={product.id} product={product}/>
