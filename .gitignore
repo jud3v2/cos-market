@@ -1,3 +1,4 @@
 frontend/.gitignore
+frontend/node_modules
 backend/vendor
 .idea/

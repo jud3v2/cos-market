@@ -19,7 +19,7 @@ return new class extends Migration
             $table->float("price");
             $table->boolean('isActive')->comment("Is this product active");
             $table->timestamps();
-            $table->foreignId("category_id")->constrained("categories")->onDelete("cascade");
+            //$table->foreignId("category_id")->constrained("categories")->onDelete("cascade");
         });
     }
 
