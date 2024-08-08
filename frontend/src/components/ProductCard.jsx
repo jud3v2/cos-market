@@ -1,7 +1,7 @@
 import React from 'react';
 import CartService from '../services/cartService';
 import { Link } from 'react-router-dom';
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
 const ProductCard = ({ product }) => {
   const { name, price, skin, created_at, id } = product;
@@ -13,10 +13,11 @@ const ProductCard = ({ product }) => {
   const weaponsName = JSON.parse(skin?.weapons || '{}').name || 'Nom de l\'arme non disponible';
   const patternName = JSON.parse(skin?.pattern || '{}').name || 'Nom du motif non disponible';
   const formattedDate = new Date(created_at).toLocaleDateString();
+  const wearPercentage = (skin.min_float * 100).toFixed(2);
 
   // Fonction pour ajouter le produit au panier
   const handleAddToCart = async (e) => {
-          e.preventDefault();
+    e.preventDefault();
     if (await CartService.addProduct(product)) {
         toast('Produit ajouté au panier', {
                 type: 'success',
@@ -33,46 +34,72 @@ const ProductCard = ({ product }) => {
                 type: 'error',
         });
     }
-};
+  };
 
   return (
     <Link to={`/product/${id}`} className="mt-4 border flex w-full max-w-4xl items-center rounded-lg overflow-hidden shadow-xl bg-white">
       <div className="w-1/4 p-4">
         <img className="w-full" src={imageUrl} alt={name} />
       </div>
-            <div className="w-3/4 px-6 py-4 flex flex-col justify-between">
-                    <div>
-                            {statTrak && <div className="font-bold text-orange-500 text-lg mb-2">{statTrak}</div>}
-                            <div className="font-bold text-xl mb-2">{name}</div>
-                            <div className="text-sm text-gray-700">{weaponsName}</div>
-                            <div className="text-sm text-gray-500">{patternName}</div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                            <div className="flex items-center mb-2">
-                                    <span className="inline-block bg-green-500 rounded-full w-3 h-3 mr-2"></span>
-                                    <span className="text-sm font-semibold text-gray-700">{isNew}</span>
-                            </div>
-                            <span className="text-sm font-semibold text-gray-700">{wear}</span>
-                            <span
-                                className="text-sm font-semibold text-gray-700">{(skin.min_float * 100).toFixed(2)}%</span>
-                    </div>
-                    <div className="flex justify-between items-center mt-2 border-t pt-2">
-                            <span className="text-sm text-gray-500">Mis en vente le {formattedDate}</span>
-                            <span className="text-lg font-semibold text-gray-900">{price} $</span>
-                    </div>
-                    <div className="flex justify-between items-center mt-2">
-                            <button
-                                onClick={handleAddToCart}
-                                className="bg-blue-500 text-white px-4 py-2 rounded"
-                            >
-                                    Ajouter au panier
-                            </button>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
-                            <div className="bg-green-500 h-2.5 rounded-full"
-                                 style={{width: `${(skin.min_float * 100).toFixed(2)}%`}}></div>
-                    </div>
-            </div>
+      <div className="w-3/4 px-6 py-4 flex flex-col justify-between">
+        <div>
+          {statTrak && <div className="font-bold text-orange-500 text-lg mb-2">{statTrak}</div>}
+          <div className="font-bold text-xl mb-2">{name}</div>
+          <div className="text-sm text-gray-700">{weaponsName}</div>
+          <div className="text-sm text-gray-500">{patternName}</div>
+        </div>
+        <div className="flex justify-between items-center">
+          <div className="flex items-center mb-2">
+            <span className="inline-block bg-green-500 rounded-full w-3 h-3 mr-2"></span>
+            <span className="text-sm font-semibold text-gray-700">{isNew}</span>
+          </div>
+          <span className="text-sm font-semibold text-gray-700">{wear}</span>
+          <span className="text-sm font-semibold text-gray-700">{wearPercentage}%</span>
+        </div>
+        <div className="flex justify-between items-center mt-2 border-t pt-2">
+          <span className="text-sm text-gray-500">Mis en vente le {formattedDate}</span>
+          <span className="text-lg font-semibold text-gray-900">{price} $</span>
+        </div>
+        <div className="flex justify-between items-center mt-2">
+          <button
+            onClick={handleAddToCart}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Ajouter au panier
+          </button>
+        </div>
+        <div className="relative w-full bg-gray-200 rounded-full h-2.5 mt-4">
+          <div
+            className="h-2.5 rounded-full"
+            style={{
+              background: 'linear-gradient(to right, #4CAF50 0%, #FFEB3B 25%, #FF9800 50%, #FF5722 75%, #F44336 100%)',
+              width: '100%',
+            }}
+          ></div>
+          <div
+            className="absolute top-[-10px] left-0 transform translate-x-[-50%]"
+            style={{
+              left: `${wearPercentage}%`,
+            }}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="text-gray-700"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M12 0L6 10H18L12 0Z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
     </Link>
   );
 };

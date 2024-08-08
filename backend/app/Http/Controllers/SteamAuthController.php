@@ -82,4 +82,25 @@ class SteamAuthController extends Controller
         }
         return redirect('/')->with('error', 'Authentication failed.');
     }
+
+    public function getInventory(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $steamId = $user->steam_id;
+        $apiKey = $this->apiKey;
+
+        $url = "http://api.steampowered.com/IEconService/GetPlayerItems/v0001/?key={$apiKey}&SteamID={$steamId}&format=json";
+
+        $response = Http::get($url);
+
+        if ($response->successful()) {
+            return response()->json($response->json());
+        }
+
+        return response()->json(['error' => 'Failed to get inventory'], 500);
+    }
 }

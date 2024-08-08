@@ -15,6 +15,7 @@ import './App.css';
 import ReactToastify from "./components/ReactToastify.jsx";
 import SteamLogin from "./views/SteamLogin.jsx";
 import CosAimLAb from "./page/CosAimLab.jsx";
+import Inventory from "./views/ProfilPage.jsx";
 
 function App() {
   const isAuthenticated = localStorage.getItem('token') !== null;
@@ -52,6 +53,7 @@ function App() {
                       <Route path="/admin/products" element={adminProtectedRoute(Product)} />
                       <Route path="/product/:id" element={Layout(ProductDetails, ClientLayout, {}, {})} />
                       <Route path={"/steam/login"} element={Layout(SteamLogin, ClientLayout, {}, {})} />
+                      <Route path="/profil" element={Layout(Inventory, ClientLayout, {}, {})} />
               </Routes>
       </Router>
   );
