@@ -74,8 +74,8 @@ const ProductCard = ({ product }) => {
           </button>
         </div>
         <div className="relative w-full bg-gray-200 rounded-full h-2.5 mt-4">
-          <span className="absolute left-0 text-sm text-gray-700">{skin.min_float}</span> {/* Affiche min_float */}
-          <span className="absolute right-0 text-sm text-gray-700">{skin.max_float}</span> {/* Affiche max_float */}
+          <span className="absolute left-0 text-sm text-gray-700">{skin.min_float}</span>
+          <span className="absolute right-0 text-sm text-gray-700">{skin.max_float}</span>
           <div
             className="h-2.5 rounded-full"
             style={{
@@ -84,7 +84,7 @@ const ProductCard = ({ product }) => {
             }}
           ></div>
           <div
-            className="absolute top-[-10px] left-0 transform translate-x-[-50%]"
+            className="absolute top-[-16px] left-0 transform translate-x-[-50%] "
             style={{
               left: `${usurePercentage}%`,
             }}
