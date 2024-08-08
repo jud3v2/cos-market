@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import CartItem from '../components/CartItem';
-import CartService from '../services/cartService';
-import '../index.css';
-import {Link} from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import CartItem from "../components/CartItem";
+import CartService from "../services/cartService";
+import Footer from "../components/Footer";
+import "../index.css";
+import { Link } from "react-router-dom";
 
 const Panier = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -13,40 +14,58 @@ const Panier = () => {
   }, []);
 
   const handleRemove = async (id) => {
-    const updatedCartItems = cartItems.filter(item => item.id !== id);
+    const updatedCartItems = cartItems.filter((item) => item.id !== id);
     setCartItems(updatedCartItems);
 
-    localStorage.setItem('cart', JSON.stringify(updatedCartItems));
+    localStorage.setItem("cart", JSON.stringify(updatedCartItems));
 
-    const steamId = localStorage.getItem('steam_id');
+    const steamId = localStorage.getItem("steam_id");
     const response = await CartService.removeItem(id);
 
     if (!response.success) {
-      console.error('Failed to remove item from database:', response.message);
+      console.error("Failed to remove item from database:", response.message);
     }
   };
 
   const totalPrice = cartItems.reduce((total, item) => total + item.price, 0);
+  const bulletCoinReduction = 0;
+  const tax = totalPrice * 0.2;
+  const finalTotal = totalPrice - bulletCoinReduction + tax;
 
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-grow bg-gray-100 p-6">
         <h1 className="text-3xl font-bold mb-4">Panier</h1>
-        <div className="flex w-full mx-auto justify-center">
-          <div className="grid grid-cols-2 gap-6">
-            {cartItems.map(item => (
-                <CartItem key={item.id} item={item} onRemove={handleRemove}/>
-            ))}
+        <div className="flex justify-between">
+          <div className="w-1/2">
+            <div className="grid grid-cols-1 gap-6 max-w-3xl">
+              {cartItems.map((item) => (
+                <CartItem key={item.id} item={item} onRemove={handleRemove} />
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="flex justify-end mt-4">
-          <div className={'flex-1'}>
-            <Link to={'/checkout'} onClick={() => {}} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              {/*TODO: Enregister les data du panier en tant que commandes */}
-                Allez sur la page de paiement
-            </Link>
+
+          <div className="w-1/2 flex flex-col items-center">
+            <div className="sticky top-4 bg-white p-10 rounded-lg shadow-md w-3/4 flex flex-col items-center">
+              <div className="text-2xl font-bold mb-4">
+                PANIER = {totalPrice.toFixed(2)}$
+              </div>
+              <div className="text-2xl font-bold mb-4">
+                BULLET COIN REDUCTION = {bulletCoinReduction.toFixed(2)}$
+              </div>
+              <div className="text-2xl font-bold mb-4">TVA = +20%</div>
+              <div className="text-2xl font-bold mt-4">
+                TOTAL = {finalTotal.toFixed(2)}$
+              </div>
+              <Link
+                to={"/checkout"}
+                onClick={() => {}}
+                className="text-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 flex justify-center "
+              >
+                ALLER SUR LA PAGE DE PAIEMENT
+              </Link>
+            </div>
           </div>
-          <div className="text-2xl font-bold">Total : {totalPrice} $</div>
         </div>
       </main>
     </div>
