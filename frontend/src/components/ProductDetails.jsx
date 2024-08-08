@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import CartService from '../services/cartService';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -51,6 +53,26 @@ const ProductDetail = () => {
     }
   };
 
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+    if (await CartService.addProduct(product)) {
+        toast('Produit ajouté au panier', {
+                type: 'success',
+        });
+        // Sauvegarder le panier dans la base de données
+        const response = await CartService.saveCartToDB(product.id);
+        if (response.success) {
+            //console.info('Panier sauvegardé dans la base de données');
+        } else {
+            //console.info('Erreur lors de la sauvegarde du panier : ' + response.message);
+        }
+    } else {
+        toast('Produit déjà dans le panier', {
+                type: 'error',
+        });
+    }
+  };
+
   if (loading) {
     return <div>Chargement...</div>;
   }
@@ -80,7 +102,7 @@ const ProductDetail = () => {
         <div className="flex-1">
           <img src={item.image} alt={item.name} className="mb-4 max-w-full" />
           <div className="items-center mb-4">
-            <button className="bg-yellow-400 hover:bg-orange-400 text-white text-xl font-bold py-3 px-52 rounded">
+            <button onClick={handleAddToCart} className="bg-yellow-400 hover:bg-orange-400 text-white text-xl font-bold py-3 px-52 rounded">
               Ajouter au panier
             </button>
           </div>
