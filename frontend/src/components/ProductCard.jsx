@@ -7,13 +7,17 @@ const ProductCard = ({ product }) => {
   const { name, price, skin, created_at, id } = product;
   const imageUrl = skin?.image || 'default-image.png';
   const rarity = skin?.rarity?.name || 'Rareté non disponible';
-  const wear = JSON.parse(skin?.wears || '[]')[0]?.name || 'Usure non spécifiée';
   const statTrak = product.stattrak ? 'STATTRAK™' : '';
   const isNew = product.stock > 0 ? 'NEUVE' : 'UTILISÉE';
   const weaponsName = JSON.parse(skin?.weapons || '{}').name || 'Nom de l\'arme non disponible';
   const patternName = JSON.parse(skin?.pattern || '{}').name || 'Nom du motif non disponible';
   const formattedDate = new Date(created_at).toLocaleDateString();
-  const wearPercentage = (skin.min_float * 100).toFixed(2);
+  const minFloat = parseFloat(skin.min_float);
+  const maxFloat = parseFloat(skin.max_float);
+  const usage = parseFloat(product.usage);
+  const usurePercentage = (usage >= minFloat && usage <= maxFloat)
+    ? ((usage - minFloat) / (maxFloat - minFloat)) * 100
+    : 0;
 
   // Fonction pour ajouter le produit au panier
   const handleAddToCart = async (e) => {
@@ -36,6 +40,8 @@ const ProductCard = ({ product }) => {
     }
   };
 
+  console.log(product);
+
   return (
     <Link to={`/product/${id}`} className="mt-4 border flex w-full max-w-4xl items-center rounded-lg overflow-hidden shadow-xl bg-white">
       <div className="w-1/4 p-4">
@@ -53,8 +59,7 @@ const ProductCard = ({ product }) => {
             <span className="inline-block bg-green-500 rounded-full w-3 h-3 mr-2"></span>
             <span className="text-sm font-semibold text-gray-700">{isNew}</span>
           </div>
-          <span className="text-sm font-semibold text-gray-700">{wear}</span>
-          <span className="text-sm font-semibold text-gray-700">{wearPercentage}%</span>
+          <span className="text-sm font-semibold text-gray-700">{usage}%</span>
         </div>
         <div className="flex justify-between items-center mt-2 border-t pt-2">
           <span className="text-sm text-gray-500">Mis en vente le {formattedDate}</span>
@@ -69,6 +74,8 @@ const ProductCard = ({ product }) => {
           </button>
         </div>
         <div className="relative w-full bg-gray-200 rounded-full h-2.5 mt-4">
+          <span className="absolute left-0 text-sm text-gray-700">{skin.min_float}</span> {/* Affiche min_float */}
+          <span className="absolute right-0 text-sm text-gray-700">{skin.max_float}</span> {/* Affiche max_float */}
           <div
             className="h-2.5 rounded-full"
             style={{
@@ -79,9 +86,10 @@ const ProductCard = ({ product }) => {
           <div
             className="absolute top-[-10px] left-0 transform translate-x-[-50%]"
             style={{
-              left: `${wearPercentage}%`,
+              left: `${usurePercentage}%`,
             }}
           >
+            <span className="text-sm font-semibold text-gray-700">{usage}%</span>
             <svg
               width="20"
               height="20"
