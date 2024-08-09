@@ -48,6 +48,7 @@ Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTran
 Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']);
 Route::get('/sync/game/check-if-user-can-play/{id}', [BulletCoinController::class, 'checkIfUserCanPlay']);
 Route::post('/payment/create-client-secret', [PaymentController::class, 'createClientSecret']);
+Route::get('/steam/inventory', [SteamAuthController::class, 'getInventory'])->name('steam.inventory');
 
 /* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
     return $request->user();
