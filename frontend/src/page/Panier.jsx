@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CartItem from "../components/CartItem";
 import CartService from "../services/cartService";
-import Footer from "../components/Footer";
 import "../index.css";
 import { Link } from "react-router-dom";
 
