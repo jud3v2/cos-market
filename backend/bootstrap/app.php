@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\VerifyUser;
+use App\Http\Middleware\VerifyUserAdmin;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 'api/*',
             ],
         );
+        $middleware->alias([
+            'user' => VerifyUser::class,
+            'admin' => VerifyUserAdmin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -24,6 +24,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 # Copy vhost config
 COPY docker/config/server/vhost.conf /etc/apache2/sites-available/000-default.conf
 
+COPY . /var/www/laravel
+
 # Enable Apache mods
 RUN a2enmod rewrite
 
@@ -35,6 +37,9 @@ ARG WWW_USER=1000
 # Create user
 RUN groupadd --force -g $WWW_USER webapp
 RUN useradd -ms /bin/bash --no-user-group -g $WWW_USER -u $WWW_USER webapp
+
+RUN chown -R webapp:webapp /var/www/laravel/storage/
+RUN chmod -R 775 /var/www/laravel/storage/
 
 # Clean cache
 RUN apt-get -y autoremove \

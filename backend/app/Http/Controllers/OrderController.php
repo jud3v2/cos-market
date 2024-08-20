@@ -164,4 +164,9 @@ class OrderController extends Controller
         {
             return response()->json(['order' => $order->delete()], 204);
         }
+
+        public function getOrders(Request $request): JsonResponse
+        {
+
+        }
     }

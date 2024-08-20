@@ -25,6 +25,20 @@ const Clients = () => {
         fetchUsers();
     }, []);
 
+    const fetchOrders = async (userId) => {
+        try {
+            const response = await axios.get(`http://localhost:8000/api/user/${userId}/orders`);
+            if (response.data.orders) {
+                setOrders(response.data.orders);
+                setSelectedUser(userId);
+            } else {
+                setError('Erreur lors de la récupération des commandes');
+            }
+        } catch (err) {
+            setError('Erreur lors de la récupération des commandes');
+        }
+    };
+
     if (loading) return <p className="text-center text-lg">Loading...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
 
@@ -39,6 +53,7 @@ const Clients = () => {
                             <th className="border px-6 py-3 text-left">Name</th>
                             <th className="border px-6 py-3 text-left">Email</th>
                             <th className="border px-6 py-3 text-left">Roles</th>
+                            <th className="border px-6 py-3 text-left">Orders</th>
                             <th className="border px-6 py-3 text-left">Actions</th>
                         </tr>
                     </thead>
@@ -49,6 +64,9 @@ const Clients = () => {
                                 <td className="border px-6 py-4">{user.name}</td>
                                 <td className="border px-6 py-4">{user.email}</td>
                                 <td className='border px-6 py-4'>{user.roles}</td>
+                                <td className='border px-6 py-4'>
+                                    <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" onClick={() => fetchOrders(user.id)}>Voir les commandes du client</button>
+                                </td>
                                 <td className='border px-6 py-4 space-x-4'>
                                     <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Edit</button>
                                     <button className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">Delete</button>

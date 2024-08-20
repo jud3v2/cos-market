@@ -20,42 +20,46 @@ use App\Http\Controllers\SteamAuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\VerifyUser;
 
-//ROUTE ADMIN
+// ROUTES SANS AUTHENTIFICATION
+
+// ROUTE ADMIN
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
-Route::get('/admin/users', [AdminAuthController::class, 'getAllUsers']);
 
 // ROUTE CLIENTS
 Route::get('steam/login', [SteamAuthController::class, 'loginWithSteam']);
 Route::get('steam/callback', [SteamAuthController::class, 'steamCallback'])->name('steam.callback');
 
-Route::resource('skin', SkinController::class)->except(['create', 'edit']);
-Route::resource('agent', AgentsController::class)->except(['create', 'edit']);
-Route::resource('collectible', CollectibleController::class)->except(['create', 'edit']);
-Route::resource('collection', CollectionsController::class)->except(['create', 'edit']);
-Route::resource('crate', CratesController::class)->except(['create', 'edit']);
-Route::resource('graffiti', GraffitiController::class)->except(['create', 'edit']);
-Route::resource('key', KeysController::class)->except(['create', 'edit']);
-Route::resource('music-kit', MusicKitsController::class)->except(['create', 'edit']);
-Route::resource('patches', PatchesController::class)->except(['create', 'edit']);
-Route::resource('stickers', StickersController::class)->except(['create', 'edit']);
-Route::resource('product', ProductController::class)->except(['create', 'edit']);
-Route::resource('cart', CartController::class)->except(['create', 'edit']);
-Route::resource('bulletcoin', BulletCoinController::class)->except(['create', 'edit', 'index', 'destroy']);
-Route::resource('transaction', TransactionController::class)->except(['create', 'edit', 'update', 'destroy']);
-Route::resource('order', OrderController::class)->except(['create', 'edit']);
-
 Route::get('/cart-remove/', [CartController::class, 'remove'])->name('cart-remove');
-Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTransaction']);
-Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']);
-Route::get('/sync/game/check-if-user-can-play/{id}', [BulletCoinController::class, 'checkIfUserCanPlay']);
-Route::post('/payment/create-client-secret', [PaymentController::class, 'createClientSecret']);
-Route::get('/steam/inventory', [SteamAuthController::class, 'getInventory'])->name('steam.inventory');
 Route::get('/product/check-available/{id}', [ProductController::class, "isProductBlocked"])->name('product.check-available');
-/* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
-    return $request->user();
-}); */
 
-/* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
-    return $request->user();
-}); */
+Route::resource('product', ProductController::class)->except(['create', 'edit']);
+
+// ROUTES AVEC AUTHENTIFICATION
+Route::middleware('user')->group(function () {
+    Route::resource('skin', SkinController::class)->except(['create', 'edit']);
+    Route::resource('agent', AgentsController::class)->except(['create', 'edit']);
+    Route::resource('collectible', CollectibleController::class)->except(['create', 'edit']);
+    Route::resource('collection', CollectionsController::class)->except(['create', 'edit']);
+    Route::resource('crate', CratesController::class)->except(['create', 'edit']);
+    Route::resource('graffiti', GraffitiController::class)->except(['create', 'edit']);
+    Route::resource('key', KeysController::class)->except(['create', 'edit']);
+    Route::resource('music-kit', MusicKitsController::class)->except(['create', 'edit']);
+    Route::resource('patches', PatchesController::class)->except(['create', 'edit']);
+    Route::resource('stickers', StickersController::class)->except(['create', 'edit']);
+    Route::resource('cart', CartController::class)->except(['create', 'edit']);
+    Route::resource('bulletcoin', BulletCoinController::class)->except(['create', 'edit', 'index', 'destroy']);
+    Route::resource('transaction', TransactionController::class)->except(['create', 'edit', 'update', 'destroy']);
+    Route::resource('order', OrderController::class)->except(['create', 'edit']);
+    Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTransaction']);
+    Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']);
+    Route::get('/sync/game/check-if-user-can-play/{id}', [BulletCoinController::class, 'checkIfUserCanPlay']);
+    Route::post('/payment/create-client-secret', [PaymentController::class, 'createClientSecret']);
+    Route::get('/steam/inventory', [SteamAuthController::class, 'getInventory'])->name('steam.inventory');
+});
+
+// ROUTES AVEC AUTHENTIFICATION ADMIN
+Route::middleware('admin')->group(function () {
+    Route::get('/admin/users', [AdminAuthController::class, 'getAllUsers']);
+});
