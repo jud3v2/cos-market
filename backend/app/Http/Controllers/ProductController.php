@@ -6,6 +6,7 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use App\Models\Skin;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -187,5 +188,55 @@ class ProductController extends Controller
         $product->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function blockProduct(Product $product): JsonResponse
+    {
+        $product->blocked_at = Carbon::now();
+        $product->save();
+
+        return response()->json($product);
+    }
+
+    public function unblockProduct(Product $product): JsonResponse
+    {
+        $product->blocked_at = null;
+        $product->save();
+
+        return response()->json($product);
+    }
+
+    public function isProductBlocked(Request $request): JsonResponse
+    {
+        $product = Product::find($request->route('id'));
+
+        if(!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
+        $blockedAt = Carbon::parse($product->blocked_at);
+        $unblockTime = Carbon::parse($blockedAt)->addMinutes(15);
+        $timeLeft = $unblockTime->diffForHumans(Carbon::now('UTC'), true);
+
+        //dd($unblockTime->isAfter($blockedAt), $unblockTime->isBefore($blockedAt), $unblockTime, $blockedAt);
+
+        if($product->blocked_at === null && $product->in_user_id_cart === null) {
+            return response()->json(['message' => 'Product is not blocked', 'isBlocked' => false]);
+        }
+
+        if($product->blocked_at !== null && $unblockTime->isBefore($blockedAt)){
+            return response()->json([
+                'message' => 'Product is blocked because is in a user cart a timeout of blocked product are not done',
+                'availability' => $timeLeft,
+                'isBlocked' => true
+            ]);
+        } elseif($product->blocked_at !== null && $unblockTime->isAfter($blockedAt)) {
+            return response()->json([
+                'message' => 'Product is not blocked',
+                'isBlocked' => false
+            ]);
+        }
+
+        return response()->json(['isBlocked' => $product->blocked_at === null, 'message' => 'Product is not blocked', 'blocked_at' => $product->blocked_at, 'unblocked_at' => $product->unblocked_at, 'availability' => $timeLeft]);
     }
 }

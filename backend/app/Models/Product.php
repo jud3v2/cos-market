@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class Product extends Model
 {
@@ -49,10 +50,5 @@ class Product extends Model
         }
 
         return null;
-    }
-
-    public function isProductInACart(): bool
-    {
-        return $this->in_user_id_cart !== null;
     }
 }

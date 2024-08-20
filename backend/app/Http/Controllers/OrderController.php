@@ -31,18 +31,20 @@ class OrderController extends Controller
         ]);
 
         $user = User::find($request->user_id);
+
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
         }
 
         $products = (new Cart($user->steam_id))->getProducts();
-
         $request->status = 'pending';
         $request->total_price = 0;
         $request->total_price_with_tax = 0;
 
         // check availability of a product and calculate the total price of the order
         foreach ($products as $product) {
+            $blockedAt = Carbon::parse($product->blocked_at);
+            $unblockTime = $blockedAt->addMinutes(15);
 
             // Vérifier si le produit a déjà été commandé par l'utilisateur.
             if (OrderedProduct::where('product_id', $product->id)->exists()) {
@@ -56,14 +58,14 @@ class OrderController extends Controller
             }
 
 
-            // si sa fait moins de 15 minute le produits est bloqué.
-            if (($product->blocked_at !== null && $product->blocked_at->diffInMinutes(Carbon::now()) < 15) && $product->in_user_id_cart != $user->id) {
+            // si sa fait moins de 15 minute le produit est bloqué.
+            if (($product->blocked_at !== null && Carbon::parse($product->blocked_at)->diffInMinutes() < 15) && $product->in_user_id_cart != $user->id) {
                 return response()->json(['error' => 'Product blocked'], 400);
             }
 
             //Si aucune personne n'a commandé ce produit
             // Cette condition permettra de bloquer le produit pour la personne qui le commande
-            // Pour un durée de 15 minutes
+            // Pour une durée de 15 minutes
             if($product->blocked_at === null && $product->in_user_id_cart === null) {
                 Product::where('id', $product->id)->update(['in_user_id_cart' => $user->id, 'blocked_at' => Carbon::now()]);
 
@@ -71,7 +73,7 @@ class OrderController extends Controller
                 $request->total_price_with_tax += $product->price * 1.2; // 20% de taxe
             }
 
-            if ($product->blocked_at !== null && $product->blocked_at->diffInMinutes(Carbon::now()) > 15) {
+            if ($product->blocked_at !== null && Carbon::parse($product->blocked_at)->diffInMinutes() > 15) {
                 Product::where('id', $product->id)->update(['in_user_id_cart' => $user->id, 'blocked_at' => Carbon::now()]);
 
                 $request->total_price += $product->price;

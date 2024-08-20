@@ -51,7 +51,7 @@ Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']
 Route::get('/sync/game/check-if-user-can-play/{id}', [BulletCoinController::class, 'checkIfUserCanPlay']);
 Route::post('/payment/create-client-secret', [PaymentController::class, 'createClientSecret']);
 Route::get('/steam/inventory', [SteamAuthController::class, 'getInventory'])->name('steam.inventory');
-
+Route::get('/product/check-available/{id}', [ProductController::class, "isProductBlocked"])->name('product.check-available');
 /* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
     return $request->user();
 }); */
