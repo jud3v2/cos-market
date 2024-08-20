@@ -9,6 +9,7 @@ use App\Http\Controllers\CratesController;
 use App\Http\Controllers\GraffitiController;
 use App\Http\Controllers\KeysController;
 use App\Http\Controllers\MusicKitsController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PatchesController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
@@ -42,6 +43,7 @@ Route::resource('product', ProductController::class)->except(['create', 'edit'])
 Route::resource('cart', CartController::class)->except(['create', 'edit']);
 Route::resource('bulletcoin', BulletCoinController::class)->except(['create', 'edit', 'index', 'destroy']);
 Route::resource('transaction', TransactionController::class)->except(['create', 'edit', 'update', 'destroy']);
+Route::resource('order', OrderController::class)->except(['create', 'edit']);
 
 Route::get('/cart-remove/', [CartController::class, 'remove'])->name('cart-remove');
 Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTransaction']);

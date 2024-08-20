@@ -22,7 +22,7 @@ class CartController extends Controller
             ],400);
         }
 
-        $cart = new Cart($_GET['steam_id'] ?? $steamId);
+        $cart = new Cart($_GET['steam_id']);
        if(isset($_GET['steam_id'])) {
         return response()->json([
             'success' => true,
