@@ -52,6 +52,7 @@ Route::middleware('user')->group(function () {
     Route::resource('bulletcoin', BulletCoinController::class)->except(['create', 'edit', 'index', 'destroy']);
     Route::resource('transaction', TransactionController::class)->except(['create', 'edit', 'update', 'destroy']);
     Route::resource('order', OrderController::class)->except(['create', 'edit']);
+
     Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTransaction']);
     Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']);
     Route::get('/sync/game/check-if-user-can-play/{id}', [BulletCoinController::class, 'checkIfUserCanPlay']);

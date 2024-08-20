@@ -9,6 +9,7 @@ use App\Models\Skin;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -208,6 +209,7 @@ class ProductController extends Controller
 
     public function isProductBlocked(Request $request): JsonResponse
     {
+        dd(Auth::user());
         $product = Product::find($request->route('id'));
 
         if(!$product) {

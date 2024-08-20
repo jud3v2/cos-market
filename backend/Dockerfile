@@ -32,6 +32,9 @@ RUN a2enmod rewrite
 # Get latest Composer
 RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
 
+# ADD PERMISSION TO STORAGE FOLDER LARAVEL
+RUN chown -R www-data:www-data /var/www/html/storage
+
 ARG WWW_USER=1000
 
 # Create user

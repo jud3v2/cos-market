@@ -105,12 +105,6 @@ class OrderController extends Controller
                 'product_id' => $product->id,
             ]);
 
-            if (!$orderedProduct) {
-                // si un produit n'a pas été créé, on supprime la commande et on retourne une erreur
-                Product::where('id', $product->id)->update(['in_user_id_cart' => null, 'blocked_at' => null]);
-                $order->delete();
-                return response()->json(['error' => 'OrderedProduct could not be created'], 500);
-            }
         }
 
         // vider le panier
