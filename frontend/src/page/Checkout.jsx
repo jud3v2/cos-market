@@ -194,7 +194,7 @@ export default function Checkout() {
           </div>
         </div>
 
-        <div className="stripe-form-wrapper mt-6 w-1/2 lg:z-50">
+        <div className="stripe-form-wrapper mt-6 lg:w-1/2 lg:z-50">
           {clientSecret && (
             <Elements stripe={stripePromise} options={options}>
               <CheckoutForm />
