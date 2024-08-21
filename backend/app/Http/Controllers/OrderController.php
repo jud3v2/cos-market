@@ -158,9 +158,33 @@ class OrderController extends Controller
         {
             return response()->json(['order' => $order->delete()], 204);
         }
-
         public function getOrders(Request $request): JsonResponse
         {
+            $user = $request->user;
 
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            // vérifie si l'utilisateur est un administrateur
+            if ($user->isAdmin()) {
+                // si l'utilisateur est un administrateur, récupère toutes les commandes
+                $orders = Order::all();
+            } else {
+                // si l'utilisateur n'est pas un administrateur, récupère uniquement les commandes de l'utilisateur connecté
+                $orders = Order::where('user_id', $user->id)->get();
+            }
+
+            return response()->json(['orders' => $orders], 200);
+        }
+
+        public function getOrdersForUser($id)
+        {
+            try {
+                $orders = Order::where('user_id', $id)->get();
+                return response()->json(['orders' => $orders], 200);
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Erreur lors de la récupération des commandes'], 500);
+            }
         }
     }
