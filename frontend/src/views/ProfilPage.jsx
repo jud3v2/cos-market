@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import '../index.css';
 
 const Inventory = () => {
     const [inventory, setInventory] = useState([]);
@@ -31,6 +32,7 @@ const Inventory = () => {
     if (error) return <p>Error: {error}</p>;
 
     return (
+<main>
         <div>
             <h1>Your Steam Inventory</h1>
             <ul>
@@ -42,6 +44,7 @@ const Inventory = () => {
                 ))}
             </ul>
         </div>
+        </main>
     );
 };
 

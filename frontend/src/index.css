@@ -18,3 +18,13 @@
 .nav-item.underline {
   border-bottom: 1px solid black;
 }
+
+.client-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* La page occupe toute la hauteur de la fenêtre */
+}
+
+main {
+  flex: 1; /* Cela pousse le footer vers le bas */
+}
