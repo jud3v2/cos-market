@@ -4,31 +4,42 @@ import { toast } from "react-toastify";
 import axios from 'axios';
 import config from "../config/index.js";
 import {jwtDecode} from "jwt-decode";
+import dayjs from "dayjs";
 
-const AddToCartButton = ({ product }) => {
-  const [isInCart, setIsInCart] = useState(false);
-  const [isBlocked, setIsBlocked] = useState(false);
-  const [blockedUntil, setBlockedUntil] = useState(null);
+const AddToCartButton = (props) => {
   const [userId, setUserId] = useState(null);
+  const { isInCart, isBlocked, blockedUntil, product, setIsBlocked, setBlockedUntil, setIsInCart, user} = props;
 
   useEffect(() => {
-    const user = localStorage.getItem('token') ? jwtDecode(localStorage.getItem('token')) : null;
-
     const checkProductInCart = () => {
       const cart = JSON.parse(localStorage.getItem('cart')) || [];
       const productInCart = cart.some(item => item.id === product.id && item.user_id === user.sub);
       setIsInCart(productInCart);
     };
 
-    const checkProductAvailability = async () => {
+    const checkProductAvailability = () => {
       try {
-        const response = await axios.get(config.backendUrl + `/product/check-available/${product.id}`);
-        const data = response.data;
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart.map((item) => {
+          if(product.id === item.id) {
+            setIsInCart(true);
+          }
+        })
 
-        if (data.isBlocked) {
-          setIsBlocked(true);
-          setBlockedUntil(data.availability);
+        const blockedAt = dayjs(product.blocked_at);
+        const unblockedAt = dayjs(product.blocked_at).add(15, 'minutes');
+        const blockedUntil = unblockedAt.diff(dayjs(), 'minutes');
+
+        if (blockedAt.isBefore(dayjs()) && unblockedAt.isAfter(dayjs())) {
+            setIsBlocked(true);
+            setBlockedUntil(blockedUntil);
         }
+
+        if (blockedAt.isBefore(dayjs()) && unblockedAt.isBefore(dayjs())) {
+            setIsBlocked(false);
+            setBlockedUntil(null);
+        }
+
       } catch (error) {
         console.error("Erreur lors de la vérification de la disponibilité du produit :", error);
       }
@@ -49,7 +60,6 @@ const AddToCartButton = ({ product }) => {
       // Vérification de la disponibilité du produit
       const response = await axios.get(config.backendUrl + '/product/check-available/' + product.id);
       const data = response.data;
-
       if (data.isBlocked) {
         toast.info(`Le produit [${product.name}] est bloqué pour ${data.availability}`);
         setIsBlocked(true);
@@ -95,21 +105,18 @@ const AddToCartButton = ({ product }) => {
   };
 
   // Déterminer la classe CSS et le texte du bouton en fonction de l'état
-  let buttonClass = "text-white px-4 py-2 rounded "; // Classe de base
+  let buttonClass = "text-white px-4 py-2 rounded bg-blue-500"; // Classe de base
 
-  let buttonText = '';
-  if (isBlocked && !isInCart) {
-    buttonClass += "bg-red-500"; // Rouge si le produit est bloqué mais pas dans le panier
-    buttonText = `Produit bloqué pendant ${blockedUntil}`;
-  } else if (isBlocked && isInCart) {
-    buttonClass += "bg-gray-500"; // Gris si le produit est bloqué et déjà dans le panier
+  let buttonText = 'Ajouter au panier';
+
+  if(isInCart) {
+    buttonClass = "text-white px-4 py-2 rounded  bg-gray-500"; // Gris si le produit est bloqué et déjà dans le panier
     buttonText = 'Produit déjà dans votre panier';
-  } else if (!isBlocked && !isInCart) {
-    buttonClass += "bg-blue-500"; // Bleu si le produit est disponible et non dans le panier
-    buttonText = 'Ajouter au panier';
-  } else if (!isBlocked && isInCart) {
-    buttonClass += "bg-gray-500"; // Gris si le produit est déjà dans le panier
-    buttonText = 'Produit déjà dans le panier';
+  }
+
+  if(isBlocked) {
+    buttonClass = "text-white px-4 py-2 rounded  bg-red-500"; // Rouge si le produit est bloqué
+    buttonText = `Produit bloqué pour ${blockedUntil} minutes`;
   }
 
   return (
