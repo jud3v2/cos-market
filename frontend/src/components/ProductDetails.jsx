@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import CartService from '../services/cartService';
+import AddToCartButton from './AddToCartButton';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -32,7 +31,7 @@ const ProductDetail = () => {
 
     const interval = setInterval(scrollStep, 20);
 
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, [item]);
 
   const fetchProduct = async () => {
@@ -53,26 +52,6 @@ const ProductDetail = () => {
     }
   };
 
-  const handleAddToCart = async (e) => {
-    e.preventDefault();
-    if (await CartService.addProduct(product)) {
-        toast('Produit ajouté au panier', {
-                type: 'success',
-        });
-        // Sauvegarder le panier dans la base de données
-        const response = await CartService.saveCartToDB(product.id);
-        if (response.success) {
-            //console.info('Panier sauvegardé dans la base de données');
-        } else {
-            //console.info('Erreur lors de la sauvegarde du panier : ' + response.message);
-        }
-    } else {
-        toast('Produit déjà dans le panier', {
-                type: 'error',
-        });
-    }
-  };
-
   if (loading) {
     return <div>Chargement...</div>;
   }
@@ -87,13 +66,21 @@ const ProductDetail = () => {
 
   const { description, weapons, pattern, min_float, max_float, collections, wears } = item;
   const { price, skin } = product;
-  const imageUrl = skin?.image || 'default-image.png';
   const rarity = skin?.rarity?.name || 'Rareté non disponible';
   const wear = JSON.parse(skin?.wears || '[]')[0]?.name || 'Usure non spécifiée';
   const statTrak = product.stattrak ? 'STATTRAK™' : '';
   const isNew = product.stock > 0 ? 'NEUVE' : 'UTILISÉE';
   const weaponsName = JSON.parse(skin?.weapons || '{}').name || 'Nom de l\'arme non disponible';
   const patternName = JSON.parse(skin?.pattern || '{}').name || 'Nom du motif non disponible';
+
+    // Enriche le produit avec les informations de l'item
+    const enrichedProduct = {
+      ...product,
+      skin: {
+        ...product.skin,
+        image: product.skin?.image || item.image,
+      }
+    };
 
   return (
     <div className="container mx-auto p-4">
@@ -102,11 +89,12 @@ const ProductDetail = () => {
         <div className="flex-1">
           <img src={item.image} alt={item.name} className="mb-4 max-w-full" />
           <div className="items-center mb-4">
-            <button onClick={handleAddToCart} className="bg-yellow-400 hover:bg-orange-400 text-white text-xl font-bold py-3 px-52 rounded">
-              Ajouter au panier
-            </button>
+            <AddToCartButton
+              product={enrichedProduct}
+              buttonClassName="bg-yellow-400 hover:bg-orange-400 text-white text-xl font-bold py-3 px-52 rounded" 
+            />
           </div>
-            <span className="text-4xl font-semibold text-gray-900">Prix : {price} $</span>
+          <span className="text-4xl font-semibold text-gray-900">Prix : {price} $</span>
         </div>
         <div className="flex-1 ml-0 md:ml-4">
           <div className="mb-4">
