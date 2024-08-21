@@ -17,7 +17,7 @@ const Products = () => {
   const [skinOptions, setSkinOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
   // Constantes pour le filtrage des produits par prix
-  const [priceRange, setPriceRange] = useState([0, 10000]);
+  const [priceRange, setPriceRange] = useState([0, 999999]);
   const [maxPrice, setMaxPrice] = useState(10000);
   const [sortOrder, setSortOrder] = useState('asc');
   // Constantes pour afficher les filtres actifs

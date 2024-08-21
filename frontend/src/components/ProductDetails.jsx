@@ -1,13 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import AddToCartButton from './AddToCartButton';
+import {jwtDecode} from "jwt-decode";
 
-const ProductDetail = () => {
+const ProductDetail = (props) => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isInCart, setIsInCart] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockedUntil, setBlockedUntil] = useState(null);
+  const user = localStorage.getItem('token') ? jwtDecode(localStorage.getItem('token')) : null;
 
   const scrollRef = useRef(null);
 
@@ -89,9 +94,14 @@ const ProductDetail = () => {
         <div className="flex-1">
           <img src={item.image} alt={item.name} className="mb-4 max-w-full" />
           <div className="items-center mb-4">
-            <AddToCartButton
-              product={enrichedProduct}
-              buttonClassName="bg-yellow-400 hover:bg-orange-400 text-white text-xl font-bold py-3 px-52 rounded" 
+            <AddToCartButton product={product}
+                             isInCart={isInCart}
+                             isBlocked={isBlocked}
+                             blockedUntil={blockedUntil}
+                             setIsBlocked={setIsBlocked}
+                             setIsInCart={setIsInCart}
+                             setBlockedUntil={setBlockedUntil}
+                             user={user}
             />
           </div>
           <span className="text-4xl font-semibold text-gray-900">Prix : {price} $</span>
