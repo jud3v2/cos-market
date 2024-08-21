@@ -16,6 +16,9 @@ import ReactToastify from "./components/ReactToastify.jsx";
 import SteamLogin from "./views/SteamLogin.jsx";
 import CosAimLAb from "./page/CosAimLab.jsx";
 import Inventory from "./views/ProfilPage.jsx";
+import {
+        RecoilRoot,
+      } from 'recoil';
 
 function App() {
   const isAuthenticated = localStorage.getItem('token') !== null;
@@ -37,6 +40,7 @@ function App() {
         }
 
   return (
+        <RecoilRoot>
       <Router>
               <Routes>
                       <Route path="/" element={Layout(Home, ClientLayout, {}, {})} />
@@ -56,6 +60,7 @@ function App() {
                       <Route path="/profil" element={Layout(Inventory, ClientLayout, {}, {})} />
               </Routes>
       </Router>
+      </RecoilRoot>
   );
 }
 

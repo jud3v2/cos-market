@@ -3,12 +3,16 @@ import CartService from '../services/cartService';
 import { toast } from "react-toastify";
 import axios from 'axios';
 import config from "../config/index.js";
-import {jwtDecode} from "jwt-decode";
+import {
+  useRecoilState,
+} from 'recoil';
+import { cartState } from '../states/cart';
 import dayjs from "dayjs";
 
 const AddToCartButton = (props) => {
   const [userId, setUserId] = useState(null);
   const { isInCart, isBlocked, blockedUntil, product, setIsBlocked, setBlockedUntil, setIsInCart, user} = props;
+  const [cart, setCart] = useRecoilState(cartState);
 
   useEffect(() => {
     const checkProductInCart = () => {
@@ -90,6 +94,8 @@ const AddToCartButton = (props) => {
 
           setIsBlocked(true);
           setBlockedUntil('15 minutes');
+          setCart([...cart, product]);
+         // localStorage.setItem('cart', JSON.stringify(cart));
         } else {
           console.error('Erreur lors de la sauvegarde du panier :', saveResponse.message);
         }
