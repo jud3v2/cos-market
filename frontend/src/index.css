@@ -28,3 +28,8 @@
 main {
   flex: 1; /* Cela pousse le footer vers le bas */
 }
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 50; /* Ou un nombre plus élevé selon votre besoin */
+}
