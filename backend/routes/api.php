@@ -19,14 +19,15 @@ use App\Http\Controllers\SteamAuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\VerifyUser;
 
 //ROUTE ADMIN
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
 Route::get('/admin/users', [AdminAuthController::class, 'getAllUsers']);
 
 // ROUTE CLIENTS
-Route::get('steam/login', [SteamAuthController::class, 'loginWithSteam']);
-Route::get('steam/callback', [SteamAuthController::class, 'steamCallback'])->name('steam.callback');
+Route::get('steam/login', [SteamAuthController::class, 'loginWithSteam'])->withoutMiddleware('user');
+Route::get('steam/callback', [SteamAuthController::class, 'steamCallback'])->name('steam.callback')->withoutMiddleware('user');
 
 Route::resource('skin', SkinController::class)->except(['create', 'edit']);
 Route::resource('agent', AgentsController::class)->except(['create', 'edit']);
@@ -48,12 +49,8 @@ Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTran
 Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']);
 Route::get('/sync/game/check-if-user-can-play/{id}', [BulletCoinController::class, 'checkIfUserCanPlay']);
 Route::post('/payment/create-client-secret', [PaymentController::class, 'createClientSecret']);
-Route::get('/steam/inventory', [SteamAuthController::class, 'getInventory'])->name('steam.inventory');
+Route::get('/steam/profile-url', [SteamAuthController::class, 'getSteamProfileUrl'])->name('steam.profile.url')->withoutMiddleware('user');
 
-/* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
-    return $request->user();
-}); */
+Route::middleware(['user'])->group(function () {
 
-/* Route::middleware('auth.jwt')->get('/user', function (Request $request) {
-    return $request->user();
-}); */
+});

@@ -1,48 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
-const Inventory = () => {
-    const [inventory, setInventory] = useState([]);
-    const [loading, setLoading] = useState(true);
+const ProfilePage = () => {
+    const [profileUrl, setProfileUrl] = useState('');
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchInventory = async () => {
+        const fetchProfileUrl = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:8000/steam/inventory', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                setInventory(response.data);
-                setLoading(false);
+                const user = jwtDecode(localStorage.getItem('token'));
+                const response = await axios.get('http://localhost:8000/api/steam/profile-url?user_id='+ user.sub);
+                setProfileUrl(response.data.profile_url);
             } catch (err) {
                 setError(err.message);
-                setLoading(false);
             }
         };
 
-        fetchInventory();
+        fetchProfileUrl();
     }, []);
 
-    if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
 
     return (
         <div>
-            <h1>Your Steam Inventory</h1>
-            <ul>
-                {inventory.map((item, index) => (
-                    <li key={index}>
-                        <img src={`https://steamcommunity-a.akamaihd.net/economy/image/${item.icon_url}`} alt={item.name} />
-                        <p>{item.name}</p>
-                    </li>
-                ))}
-            </ul>
+            <h1>Your Steam Profile</h1>
+            {profileUrl ? (
+                <a href={profileUrl} target="_blank" rel="noopener noreferrer">
+                    <button>View Your Steam Profile</button>
+                </a>
+            ) : (
+                <p>Loading...</p>
+            )}
         </div>
     );
 };
 
-export default Inventory;
+export default ProfilePage;

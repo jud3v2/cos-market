@@ -73,38 +73,45 @@ const ProductCard = ({ product }) => {
             Ajouter au panier
           </button>
         </div>
-        <div className="relative w-full bg-gray-200 rounded-full h-2.5 mt-4">
-          <span className="absolute left-0 text-sm text-gray-700">{skin.min_float}</span>
-          <span className="absolute right-0 text-sm text-gray-700">{skin.max_float}</span>
-          <div
-            className="h-2.5 rounded-full"
-            style={{
-              background: 'linear-gradient(to right, #4CAF50 0%, #FFEB3B 25%, #FF9800 50%, #FF5722 75%, #F44336 100%)',
-              width: '100%',
-            }}
-          ></div>
-          <div
-            className="absolute top-[-16px] left-0 transform translate-x-[-50%] "
-            style={{
-              left: `${usurePercentage}%`,
-            }}
-          >
-            <span className="text-sm font-semibold text-gray-700">{usage}%</span>
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="text-gray-700 z-0"
+        <div className="relative w-full mt-4">
+          <div className="absolute left-2 transform -translate-x-full text-sm text-gray-700">
+            {skin.min_float}
+          </div>
+          <div className="absolute right-2 transform translate-x-full text-sm text-gray-700">
+            {skin.max_float}
+          </div>
+          <div className="relative bg-gray-200 rounded-full h-2.5 mx-6">
+            <div
+              className="h-2.5 rounded-full"
+              style={{
+                background: 'linear-gradient(to right, #4CAF50 0%, #FFEB3B 25%, #FF9800 50%, #FF5722 75%, #F44336 100%)',
+                width: '100%',
+                margin: '0 auto',
+              }}
+            ></div>
+            <div
+              className="absolute top-[-16px] transform translate-x-[-50%]"
+              style={{
+                left: `${usurePercentage}%`,
+              }}
             >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M12 0L6 10H18L12 0Z"
-                fill="currentColor"
-              />
-            </svg>
+              <span className="text-sm font-semibold text-gray-700">{usage}%</span>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 -3 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-gray-700 z-0"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M12 0L6 10H18L12 0Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
           </div>
         </div>
       </div>

@@ -14,9 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(
             except: [
-                'api/*',
+                "api/*",
             ],
         );
+        $middleware->alias(['user', \App\Http\Middleware\VerifyUser::class]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

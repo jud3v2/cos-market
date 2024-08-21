@@ -86,14 +86,9 @@ const ProductDetail = () => {
   }
 
   const { description, weapons, pattern, min_float, max_float, collections, wears } = item;
-  const { price, skin } = product;
   const imageUrl = skin?.image || 'default-image.png';
   const rarity = skin?.rarity?.name || 'Rareté non disponible';
   const wear = JSON.parse(skin?.wears || '[]')[0]?.name || 'Usure non spécifiée';
-  const statTrak = product.stattrak ? 'STATTRAK™' : '';
-  const isNew = product.stock > 0 ? 'NEUVE' : 'UTILISÉE';
-  const weaponsName = JSON.parse(skin?.weapons || '{}').name || 'Nom de l\'arme non disponible';
-  const patternName = JSON.parse(skin?.pattern || '{}').name || 'Nom du motif non disponible';
 
   return (
     <div className="container mx-auto p-4">
