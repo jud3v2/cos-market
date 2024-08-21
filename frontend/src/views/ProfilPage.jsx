@@ -3,36 +3,51 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
 const ProfilePage = () => {
-    const [steamId, setSteamId] = useState('');
+    const [userProfile, setUserProfile] = useState(null);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchSteamId = async () => {
+        const fetchUserProfile = async () => {
             try {
-                const user = jwtDecode(localStorage.getItem('token'));
-                const response = await axios.get('http://localhost:8000/api/steam/profile-url?user_id=' + user.sub);
-                const profileUrl = response.data.profile_url;
+                const token = localStorage.getItem('token');
+                const user = jwtDecode(token);
+                const response = await axios.get(`http://localhost:8000/api/user-profile/${user.sub}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
 
-                const steamId = profileUrl.split('/').filter(Boolean).pop();
-                setSteamId(steamId);
+                setUserProfile(response.data);
             } catch (err) {
                 setError(err.message);
             }
         };
 
-        fetchSteamId();
+        fetchUserProfile();
     }, []);
 
     if (error) return <p>Error: {error}</p>;
-    const inventoryUrl = `https://steamcommunity.com/profiles/${steamId}/inventory/#730`;
 
     return (
         <div>
-            <h1>Your Steam Profile</h1>
-            {steamId ? (
-                <a href={inventoryUrl} target="_blank" rel="noopener noreferrer">
-                    <button>View Your CS:GO Inventory</button>
-                </a>
+            {userProfile ? (
+                <div>
+                    <img src={userProfile.avatar} alt="Steam Avatar" style={{ borderRadius: '50%', width: '150px', height: '150px' }} />
+                    <h2>{userProfile.profile_name}</h2>
+                    <p><strong>Pays :</strong> {userProfile.country || 'Unknown'}</p>
+                    <p><strong>Adresse email :</strong> {userProfile.email || 'Unknown'}</p>
+                    <p><strong>Steam ID :</strong> {userProfile.steam_id || 'Unknown'}</p>
+                    <a href={`${userProfile.profile_url}/inventory/#730`} target="_blank" rel="noopener noreferrer">
+                        <button className="bg-yellow-400 hover:bg-orange-400 text-white text-xl font-bold py-3 px-52 rounded">
+                            Voir mon inventaire Counter Strike 2
+                        </button>
+                    </a>
+                    <a href={userProfile.profile_url} target="_blank" rel="noopener noreferrer">
+                        <button className="flex mt-2 bg-yellow-400 hover:bg-orange-400 text-white text-xl font-bold py-3 px-52 rounded">
+                            Voir mon profil Steam
+                        </button>
+                    </a>
+                </div>
             ) : (
                 <p>Loading...</p>
             )}
@@ -41,4 +56,3 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
-

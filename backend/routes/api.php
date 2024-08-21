@@ -50,6 +50,8 @@ Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']
 Route::get('/sync/game/check-if-user-can-play/{id}', [BulletCoinController::class, 'checkIfUserCanPlay']);
 Route::post('/payment/create-client-secret', [PaymentController::class, 'createClientSecret']);
 Route::get('/steam/profile-url', [SteamAuthController::class, 'getSteamProfileUrl'])->name('steam.profile.url')->withoutMiddleware('user');
+Route::get('/user-profile/{id}', [SteamAuthController::class, 'getUserProfile'])->name('user.profile');
+
 
 Route::middleware(['user'])->group(function () {
 

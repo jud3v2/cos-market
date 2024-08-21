@@ -85,4 +85,16 @@ class SteamAuthController extends Controller
     
         return response()->json(['profile_url' => $user->profile_url]);
     }
+
+    public function getUserProfile($id)
+{
+    $user = User::find($id);
+
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+
+    return response()->json($user);
+}
+
 }
