@@ -1,5 +1,4 @@
-/* Sticky Cart and Billing Information for Desktop */
-@media (min-width: 1024px) { /* Desktop and above */
+@media (min-width: 1024px) {
   .summary-section {
     position: relative;
   }
@@ -7,6 +6,6 @@
   .summary-section .sticky-container {
     position: -webkit-sticky;
     position: sticky;
-    top: 1rem; /* Adjust this value to control how far from the top it sticks */
+    top: 1rem;
   }
 }
