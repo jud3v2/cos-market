@@ -1,10 +1,6 @@
 import React from 'react';
-import CartService from '../services/cartService';
 import { Link } from 'react-router-dom';
-import { toast } from "react-toastify";
-import axios from 'axios';
-import config from "../config/index.js";
-import {jwtDecode} from "jwt-decode";
+import AddToCartButton from './AddToCartButton';
 
 const ProductCard = ({ product }) => {
   const { name, price, skin, created_at, id } = product;
@@ -21,61 +17,6 @@ const ProductCard = ({ product }) => {
   const usurePercentage = (usage >= minFloat && usage <= maxFloat)
     ? ((usage - minFloat) / (maxFloat - minFloat)) * 100
     : 0;
-
-  // Fonction pour ajouter le produit au panier
-        const handleAddToCart = async (e) => {
-                e.preventDefault();
-                const user = jwtDecode(localStorage.getItem('token'));
-                const response = axios.get(config.backendUrl + '/product/check-available/' + product.id)
-                    .then(async (response) => {
-                            const data = response.data;
-                            if(data.isBlocked) {
-                                    toast.info('Le produit [' + product.name + '] est bloqué pour ' + data.availability)
-                                    return false;
-                            } else {
-                                    if (CartService.addProduct(product)) {
-                                            toast('Produit ajouté au panier', {
-                                                    type: 'success',
-                                            });
-                                            // Sauvegarder le panier dans la base de données
-                                            const response = await CartService.saveCartToDB(product.id);
-
-                                            if (response.success) {
-                                                    const blockProductPromise = axios.put(config.backendUrl + '/product/block/' + product.id, {
-                                                            user_id: parseInt(user.sub),
-                                                            product: product.id
-                                                    }, {
-                                                            headers: {
-                                                                    Authorization: 'Bearer ' + localStorage.getItem('token')
-                                                            }
-                                                    });
-                                                    await toast.promise(blockProductPromise, {
-                                                            pending: 'Mise à jour de la disponibilité du produit...',
-                                                            success: 'Produit bloqué pendant 15 minute',
-                                                            error: 'Erreur lors de la mise à jour de la disponibilité du produit'
-                                                    });
-                                            } else {
-                                                    console.info('Erreur lors de la sauvegarde du panier : ' + response.message);
-                                            }
-                                    } else {
-                                            toast('Le produit [' + product.name + '] est déjà dans votre panier', {
-                                                    type: 'error',
-                                            });
-                                    }
-                            }
-                            return response.data;
-                    })
-                    .catch((error) => {
-                            console.error('Erreur lors de la récupération du produit : ' + error);
-                            return null;
-                    })
-
-                await toast.promise(response, {
-                        pending: 'Vérification de la disponibilité du produit...',
-                        success: 'Produit disponible',
-                        error: 'Produit indisponible'
-                })
-  };
 
   return (
     <Link to={`/product/${id}`} className="mt-4 border flex w-full max-w-4xl items-center rounded-lg overflow-hidden shadow-xl bg-white">
@@ -101,12 +42,7 @@ const ProductCard = ({ product }) => {
           <span className="text-lg font-semibold text-gray-900">{price} $</span>
         </div>
         <div className="flex justify-between items-center mt-2">
-          <button
-            onClick={handleAddToCart}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Ajouter au panier
-          </button>
+          <AddToCartButton product={product} />
         </div>
         <div className="relative w-full bg-gray-200 rounded-full h-2.5 mt-4">
           <span className="absolute left-0 text-sm text-gray-700">{skin.min_float}</span>
