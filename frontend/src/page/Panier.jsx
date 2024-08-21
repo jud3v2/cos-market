@@ -56,9 +56,12 @@ const Panier = () => {
               <div className="text-2xl font-bold mt-4">
                 TOTAL = {finalTotal.toFixed(2)}$
               </div>
+              <p className={'text-sm'}><small>Bonjour en cliquant sur le bouton ci-dessous cela impliquera que les produits disponible dans votre commande vous seront bloquer pendant 15 minutes, de plus cela impliquera la convertion de votre panier en commande. </small></p>
               <Link
                 to={"/checkout"}
-                onClick={() => {}}
+                onClick={() => {
+                  console.log("sending cart items to checkout")
+                }}
                 className="text-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 flex justify-center "
               >
                 ALLER SUR LA PAGE DE PAIEMENT
