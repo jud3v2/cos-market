@@ -23,10 +23,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\VerifyUser;
 
 // ROUTES SANS AUTHENTIFICATION
+Route::post('/payment/create-client-secret', [PaymentController::class, 'createClientSecret']);
 
-// ROUTE ADMIN
-Route::post('/admin/login', [AdminAuthController::class, 'login']);
-
+Route::put('/product/block/{id}', [ProductController::class, 'blockProduct'])->name('product.block');
+Route::put('/product/unblock/{id}', [ProductController::class, 'unblockProduct'])->name('product.block');
 // ROUTE CLIENTS
 Route::get('steam/login', [SteamAuthController::class, 'loginWithSteam']);
 Route::get('steam/callback', [SteamAuthController::class, 'steamCallback'])->name('steam.callback');
@@ -34,7 +34,12 @@ Route::get('steam/callback', [SteamAuthController::class, 'steamCallback'])->nam
 Route::get('/cart-remove/', [CartController::class, 'remove'])->name('cart-remove');
 Route::get('/product/check-available/{id}', [ProductController::class, "isProductBlocked"])->name('product.check-available');
 
+// ressource routes
 Route::resource('product', ProductController::class)->except(['create', 'edit']);
+Route::resource('cart', CartController::class)->except(['create', 'edit']);
+
+// ROUTE ADMIN
+Route::post('/admin/login', [AdminAuthController::class, 'login']);
 
 // ROUTES AVEC AUTHENTIFICATION
 Route::middleware('user')->group(function () {
@@ -48,7 +53,6 @@ Route::middleware('user')->group(function () {
     Route::resource('music-kit', MusicKitsController::class)->except(['create', 'edit']);
     Route::resource('patches', PatchesController::class)->except(['create', 'edit']);
     Route::resource('stickers', StickersController::class)->except(['create', 'edit']);
-    Route::resource('cart', CartController::class)->except(['create', 'edit']);
     Route::resource('bulletcoin', BulletCoinController::class)->except(['create', 'edit', 'index', 'destroy']);
     Route::resource('transaction', TransactionController::class)->except(['create', 'edit', 'update', 'destroy']);
     Route::resource('order', OrderController::class)->except(['create', 'edit']);
@@ -56,7 +60,6 @@ Route::middleware('user')->group(function () {
     Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTransaction']);
     Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']);
     Route::get('/sync/game/check-if-user-can-play/{id}', [BulletCoinController::class, 'checkIfUserCanPlay']);
-    Route::post('/payment/create-client-secret', [PaymentController::class, 'createClientSecret']);
     Route::get('/steam/inventory', [SteamAuthController::class, 'getInventory'])->name('steam.inventory');
 });
 

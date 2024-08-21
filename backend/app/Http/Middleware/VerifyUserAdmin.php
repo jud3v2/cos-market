@@ -55,7 +55,7 @@ class VerifyUserAdmin
 
         if ($roles !== null && !in_array("admin", $roles)) {
             Log::warning('User not admin');
-            return response()->json(['error' => $role], 401);
+            return response()->json(['error' => $roles], 401);
         }
 
         $request->attributes->add(['admin' => $user]);
