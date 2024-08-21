@@ -17,9 +17,10 @@ const Products = () => {
   const [skinOptions, setSkinOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
   // Constantes pour le filtrage des produits par prix
-  const [priceRange, setPriceRange] = useState([0, 999999]);
-  const [maxPrice, setMaxPrice] = useState(10000);
+  const [priceRange, setPriceRange] = useState([0, 0]);
+  const [maxPrice, setMaxPrice] = useState();
   const [sortOrder, setSortOrder] = useState('asc');
+  const [isPriceFilterActive, setIsPriceFilterActive] = useState(false);
   // Constantes pour afficher les filtres actifs
   const [activeFilters, setActiveFilters] = useState([]);
 
@@ -28,7 +29,7 @@ const Products = () => {
     if (searchTerm) filters.push(`Search: ${searchTerm}`);
     if (selectedCategory) filters.push(`Category: ${selectedCategory}`);
     if (selectedSkin) filters.push(`Skin: ${selectedSkin}`);
-    if (priceRange[0] !== 0 || priceRange[1] !== 10000) filters.push(`Price: ${priceRange[0]} - ${priceRange[1]}`);
+    if (isPriceFilterActive) filters.push(`Price: ${priceRange[0]} - ${priceRange[1]}`);
     setActiveFilters(filters);
   };
 
@@ -47,6 +48,7 @@ const Products = () => {
 
         const maxPrice = Math.max(...fetchedProducts.map(product => product.price), 0);
         setMaxPrice(maxPrice);
+
         setPriceRange([0, maxPrice]);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -100,6 +102,7 @@ const Products = () => {
 
   const handlePriceChange = (value) => {
     setPriceRange(value);
+    setIsPriceFilterActive(true);
   };
 
   const handleSortChange = (value) => {
@@ -118,12 +121,13 @@ const Products = () => {
       setSelectedSkin('');
     } else if (filter.startsWith('Price:')) {
       setPriceRange([0, maxPrice]);
+      setIsPriceFilterActive(false);
     }
   };
 
   useEffect(() => {
     updateActiveFilters();
-  }, [searchTerm, selectedCategory, selectedSkin, priceRange]);
+  }, [searchTerm, selectedCategory, selectedSkin, priceRange, isPriceFilterActive]);
 
   useEffect(() => {
     const filteredSkins = new Set();
@@ -214,36 +218,36 @@ const Products = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {products
-            .filter(product => {
-              const skin = product.skin;
-              const categoryString = skin?.category;
-              const weaponsString = skin?.weapons;
-              let category = null;
-              let weapon = null;
+          .filter(product => {
+            const skin = product.skin;
+            const categoryString = skin?.category;
+            const weaponsString = skin?.weapons;
+            let category = null;
+            let weapon = null;
 
-              if (categoryString) {
-                try {
-                  category = JSON.parse(categoryString);
-                } catch (error) {
-                  console.error('Error parsing category:', error);
-                }
+            if (categoryString) {
+              try {
+                category = JSON.parse(categoryString);
+              } catch (error) {
+                console.error('Error parsing category:', error);
               }
+            }
 
-              if (weaponsString) {
-                try {
-                  weapon = JSON.parse(weaponsString);
-                } catch (error) {
-                  console.error('Error parsing weapons:', error);
-                }
+            if (weaponsString) {
+              try {
+                weapon = JSON.parse(weaponsString);
+              } catch (error) {
+                console.error('Error parsing weapons:', error);
               }
+            }
 
-              const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-              const matchesCategory = selectedCategory ? category?.name.toLowerCase() === selectedCategory.toLowerCase() : true;
-              const matchesSkin = selectedSkin ? weapon?.name.toLowerCase() === selectedSkin.toLowerCase() : true;
-              const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
+            const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesCategory = selectedCategory ? category?.name.toLowerCase() === selectedCategory.toLowerCase() : true;
+            const matchesSkin = selectedSkin ? weapon?.name.toLowerCase() === selectedSkin.toLowerCase() : true;
+            const matchesPrice = !isPriceFilterActive || (product.price >= priceRange[0] && product.price <= priceRange[1]);
 
-              return matchesSearch && matchesCategory && matchesSkin && matchesPrice;
-            })
+            return matchesSearch && matchesCategory && matchesSkin && matchesPrice;
+          })
             .sort((a, b) => {
               return sortOrder === 'asc' ? a.price - b.price : b.price - a.price;
             })

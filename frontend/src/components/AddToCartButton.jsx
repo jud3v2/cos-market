@@ -109,14 +109,14 @@ const AddToCartButton = (props) => {
 
   let buttonText = 'Ajouter au panier';
 
-  if(isInCart) {
-    buttonClass = "text-white px-4 py-2 rounded  bg-gray-500"; // Gris si le produit est bloqué et déjà dans le panier
-    buttonText = 'Produit déjà dans votre panier';
-  }
-
   if(isBlocked) {
     buttonClass = "text-white px-4 py-2 rounded  bg-red-500"; // Rouge si le produit est bloqué
     buttonText = `Produit bloqué pour ${blockedUntil} minutes`;
+  }
+
+  if(isInCart) {
+    buttonClass = "text-white px-4 py-2 rounded  bg-gray-500"; // Gris si le produit est bloqué et déjà dans le panier
+    buttonText = 'Produit déjà dans votre panier';
   }
 
   return (
