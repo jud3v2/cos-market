@@ -48,7 +48,6 @@ const Products = () => {
 
         const maxPrice = Math.max(...fetchedProducts.map(product => product.price), 0);
         setMaxPrice(maxPrice);
-
         setPriceRange([0, maxPrice]);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -127,7 +126,7 @@ const Products = () => {
 
   useEffect(() => {
     updateActiveFilters();
-  }, [searchTerm, selectedCategory, selectedSkin, priceRange, isPriceFilterActive]);
+  }, [searchTerm, selectedCategory, selectedSkin, priceRange]);
 
   useEffect(() => {
     const filteredSkins = new Set();
@@ -218,36 +217,36 @@ const Products = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {products
-          .filter(product => {
-            const skin = product.skin;
-            const categoryString = skin?.category;
-            const weaponsString = skin?.weapons;
-            let category = null;
-            let weapon = null;
+            .filter(product => {
+              const skin = product.skin;
+              const categoryString = skin?.category;
+              const weaponsString = skin?.weapons;
+              let category = null;
+              let weapon = null;
 
-            if (categoryString) {
-              try {
-                category = JSON.parse(categoryString);
-              } catch (error) {
-                console.error('Error parsing category:', error);
+              if (categoryString) {
+                try {
+                  category = JSON.parse(categoryString);
+                } catch (error) {
+                  console.error('Error parsing category:', error);
+                }
               }
-            }
 
-            if (weaponsString) {
-              try {
-                weapon = JSON.parse(weaponsString);
-              } catch (error) {
-                console.error('Error parsing weapons:', error);
+              if (weaponsString) {
+                try {
+                  weapon = JSON.parse(weaponsString);
+                } catch (error) {
+                  console.error('Error parsing weapons:', error);
+                }
               }
-            }
 
-            const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesCategory = selectedCategory ? category?.name.toLowerCase() === selectedCategory.toLowerCase() : true;
-            const matchesSkin = selectedSkin ? weapon?.name.toLowerCase() === selectedSkin.toLowerCase() : true;
-            const matchesPrice = !isPriceFilterActive || (product.price >= priceRange[0] && product.price <= priceRange[1]);
+              const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+              const matchesCategory = selectedCategory ? category?.name.toLowerCase() === selectedCategory.toLowerCase() : true;
+              const matchesSkin = selectedSkin ? weapon?.name.toLowerCase() === selectedSkin.toLowerCase() : true;
+              const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
 
-            return matchesSearch && matchesCategory && matchesSkin && matchesPrice;
-          })
+              return matchesSearch && matchesCategory && matchesSkin && matchesPrice;
+            })
             .sort((a, b) => {
               return sortOrder === 'asc' ? a.price - b.price : b.price - a.price;
             })

@@ -22,9 +22,18 @@
 .client-layout {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* La page occupe toute la hauteur de la fenêtre */
+  min-height: 100vh;
 }
 
 main {
-  flex: 1; /* Cela pousse le footer vers le bas */
+  flex: 1;
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 50;
+  top: 100%; /* Place the dropdown directly below the button */
+  left: 0;  /* Align it with the left of the parent */
+  transform: translateY(0); /* Ensures it is directly below without any offset */
+  min-width: 150px; /* Optional: Ensures dropdown width doesn't collapse */
 }
