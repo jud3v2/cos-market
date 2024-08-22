@@ -48,8 +48,8 @@ const Panier = () => {
     <div className="flex flex-col min-h-screen">
       <main className="flex-grow bg-gray-100 p-6">
         <h1 className="text-3xl font-bold mb-4">Panier</h1>
-        <div className="flex justify-between">
-          <div className="w-1/2">
+        <div className="flex flex-col lg:flex-row lg:justify-between">
+          <div className="w-full lg:w-1/2">
             <div className="grid grid-cols-1 gap-6 max-w-3xl">
               {cartItems.map((item) => (
                 <CartItem key={item.id} item={item} onRemove={handleRemove} />
@@ -57,8 +57,8 @@ const Panier = () => {
             </div>
           </div>
 
-          <div className="w-1/2 flex flex-col items-center">
-            <div className="sticky top-4 bg-white p-10 rounded-lg shadow-md w-3/4 flex flex-col items-center">
+          <div className="w-full lg:w-1/2 flex flex-col items-center mt-6 lg:mt-0">
+            <div className="sticky top-4 bg-white p-10 rounded-lg shadow-md w-full lg:w-3/4 flex flex-col items-center">
               <div className="text-2xl font-bold mb-4">
                 Sous-total (sans TVA) = {totalPrice.toFixed(2)}$
               </div>
@@ -67,35 +67,42 @@ const Panier = () => {
                 Prix avec TVA (20%) = {priceWithTax.toFixed(2)}$
               </div>
 
-                <div className="text-2xl font-bold mb-4">BULLET COINS</div>
-                <div className="flex items-center mb-4">
-                  <button
-                    onClick={decrementBulletCoins}
-                    className="bg-red-500 text-white px-3 py-1 rounded-l"
-                  >
-                    -
-                  </button>
-                  <div className="px-4 py-2 text-lg">{bulletCoins}</div>
-                  <button
-                    onClick={incrementBulletCoins}
-                    className="bg-green-500 text-white px-3 py-1 rounded-r"
-                  >
-                    +
-                  </button>
-                </div>
-                <div className="text-xl font-bold mb-4">
-                  Réduction avec Bullet Coins = -
-                  {bulletCoinReduction.toFixed(2)}$
-                </div>
+              <div className="text-2xl font-bold mb-4">BULLET COINS</div>
+              <div className="flex items-center mb-4">
+                <button
+                  onClick={decrementBulletCoins}
+                  className="bg-red-500 text-white px-3 py-1 rounded-l"
+                >
+                  -
+                </button>
+                <div className="px-4 py-2 text-lg">{bulletCoins}</div>
+                <button
+                  onClick={incrementBulletCoins}
+                  className="bg-green-500 text-white px-3 py-1 rounded-r"
+                >
+                  +
+                </button>
+              </div>
+              <div className="text-xl font-bold mb-4">
+                Réduction avec Bullet Coins = -
+                {bulletCoinReduction.toFixed(2)}$
+              </div>
 
               <div className="text-2xl font-bold mt-4">
                 TOTAL À PAYER = {finalTotal.toFixed(2)}$
               </div>
-              <p className={'text-sm'}><small>Bonjour en cliquant sur le bouton ci-dessous cela impliquera que les produits disponible dans votre commande vous seront bloquer pendant 15 minutes, de plus cela impliquera la convertion de votre panier en commande. </small></p>
+              <p className={"text-sm"}>
+                <small>
+                  Bonjour en cliquant sur le bouton ci-dessous cela impliquera
+                  que les produits disponibles dans votre commande vous seront
+                  bloqués pendant 15 minutes, de plus cela impliquera la
+                  conversion de votre panier en commande.
+                </small>
+              </p>
               <Link
                 to={"/checkout"}
                 onClick={() => {
-                  console.log("sending cart items to checkout")
+                  console.log("sending cart items to checkout");
                 }}
                 className="text-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 flex justify-center "
               >
