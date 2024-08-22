@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\VerifyUser;
 
 // ROUTES SANS AUTHENTIFICATION
+Route::post('/payment/create-client-secret', [PaymentController::class, 'createClientSecret']);
 
 // ROUTE ADMIN
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
@@ -56,7 +57,6 @@ Route::middleware('user')->group(function () {
     Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTransaction']);
     Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']);
     Route::get('/sync/game/check-if-user-can-play/{id}', [BulletCoinController::class, 'checkIfUserCanPlay']);
-    Route::post('/payment/create-client-secret', [PaymentController::class, 'createClientSecret']);
     Route::get('/steam/inventory', [SteamAuthController::class, 'getInventory'])->name('steam.inventory');
 });
 

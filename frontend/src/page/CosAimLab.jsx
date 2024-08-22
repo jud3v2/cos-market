@@ -4,8 +4,19 @@ import { incrementScore, incrementBulletCoin, decrementLives, incrementGameSpeed
 import { motion } from 'framer-motion';
 import Loading from "../components/Loading.jsx";
 import axios from 'axios';
-import {toast} from "react-toastify";
-import {jwtDecode} from "jwt-decode";
+import { toast } from "react-toastify";
+import { jwtDecode } from "jwt-decode";
+
+// Import target images
+import cibleBleu from '../assets/aimlab/cible_bleu.png';
+import cibleOrange from '../assets/aimlab/cible_orange.png';
+import cibleJaune from '../assets/aimlab/cible_jaune.png';
+import cibleRouge from '../assets/aimlab/cible_rouge.png';
+
+// Import background images
+import Mirage from '../assets/aimlab/mirage.png';
+import Inferno from '../assets/aimlab/inferno.png';
+import Dust from '../assets/aimlab/dust.png';
 
 const Game = () => {
     const dispatch = useDispatch();
@@ -16,6 +27,7 @@ const Game = () => {
     const [gameStarted, setGameStarted] = useState(false);
     const [loading, setLoading] = useState(true);
     const [buttonLoading, setButtonLoading] = useState(false);
+    const [selectedBackground, setSelectedBackground] = useState(null);
 
     const [attempts, setAttempts] = useState(() => {
         const savedAttempts = localStorage.getItem('attempts');
@@ -31,12 +43,10 @@ const Game = () => {
         const loading = toast.loading("Dépôt de vos bullet coins en cours...");
         setButtonLoading(true);
         try {
-            // Fetch bullet coin table here
             const btDataResponse = await axios.post('/bulletcoin/', { user_id: user.id });
             const btData = btDataResponse.data;
             console.log('bulletcoin data fetched');
 
-            // Create a new transaction
             const ctResponse = await axios.post('/transaction', {
                 user_id: user.id,
                 type: 'deposit',
@@ -48,7 +58,6 @@ const Game = () => {
             const bcId = btData.id;
             const transactionId = ct.transaction_id;
 
-            // Make a deposit
             await axios.put(`/bulletcoin/${bcId}`, {
                 user_id: user.id,
                 amount: bulletCoin <= 50 ? bulletCoin : 50,
@@ -112,7 +121,7 @@ const Game = () => {
     useEffect(() => {
         const dailyInterval = setInterval(() => {
             dispatch(incrementGameSpeed());
-        }, 15 * 1000); // 30 * 1000 = 30 seconds
+        }, 15 * 1000);
 
         return () => clearInterval(dailyInterval);
     }, [dispatch]);
@@ -123,18 +132,18 @@ const Game = () => {
             localStorage.setItem('dateResetAttempt', JSON.stringify(dateResetAttempt));
             localStorage.setItem('attempts', JSON.stringify(attempts));
 
-            return  () => {
+            return () => {
                 syncGame().then(r => console.log(r));
             }
         }
     }, [lives]);
 
     const handleTargetClick = (target) => {
-        if (target.type === 'golden') {
+        if (target.type === 'yellow') {
             dispatch(incrementBulletCoin(1));
         } else if (target.type === 'red' || target.type === 'orange') {
             dispatch(decrementLives());
-        } else {
+        } else if (target.type === 'blue') {
             dispatch(incrementScore(10));
         }
         setTargets(targets.filter((t) => t.id !== target.id));
@@ -142,10 +151,10 @@ const Game = () => {
 
     const getRandomTargetType = () => {
         const rand = Math.random();
-        if (rand < 0.1) return 'golden';
-        if (rand < 0.2) return 'orange';
-        if (rand < 0.3) return 'red';
-        return 'normal';
+        if (rand < 0.2) return 'yellow';  // 20% chance to spawn yellow target
+        if (rand < 0.4) return 'orange';  // 20% chance to spawn orange target
+        if (rand < 0.6) return 'red';     // 20% chance to spawn red target
+        return 'blue';                    // 40% chance to spawn blue target (default)
     };
 
     const syncGame = async () => {
@@ -167,6 +176,23 @@ const Game = () => {
         }
     }
 
+    if (lives === 0) {
+        return (
+            <div className="game">
+                <div className="game-over">
+                    <h3 className={"my-5 text-lg"}>Game Over</h3>
+                    <p>Score: {score}</p>
+                    <p>Bullet Coins: {bulletCoin}</p>
+                    <p>Essaie restant: {3 - attempts}</p>
+                    <button className={"bg-yellow-500 hover:bg-yellow-700 text-white rounded p-2"} onClick={() => window.location.reload()}>Rejouer</button>
+                    {bulletCoin > 0 && (
+                        <button className={"bg-yellow-500 hover:bg-yellow-700 text-white rounded p-2"} onClick={async () => await makeDeposit()}>Récupérer mes bullet coins</button>
+                    )}
+                </div>
+            </div>
+        );
+    }
+    
     const checkIfUseCanPlay = async () => {
         const loading = toast.loading("Vérification de vos essais en cours...");
         try {
@@ -192,23 +218,7 @@ const Game = () => {
 
     if (loading) return <Loading />;
 
-    if (lives === 0) {
-        return (
-            <div className="game">
-                <div className="game-over">
-                    <h3 className={"my-5 text-lg"}>Game Over</h3>
-                    <p>Score: {score}</p>
-                    <p>Bullet Coins: {bulletCoin}</p>
-                    <p>Essaie restant: {3 - attempts}</p>
-                    <button className={"bg-yellow-500 hover:bg-yellow-700 text-white rounded p-2"} onClick={() => window.location.reload()}>Rejouer</button>
-                    {bulletCoin > 0 && (
-                        <button className={"bg-yellow-500 hover:bg-yellow-700 text-white rounded p-2"} onClick={async () => await makeDeposit()}>Récupérer mes bullet coins</button>
-                    )}
-                </div>
-            </div>
-        );
-    }
-
+    // Pre-game background selection screen
     if (!gameStarted) {
         return (
             <div className="game">
@@ -218,14 +228,38 @@ const Game = () => {
                     <p>Lives: {lives}</p>
                 </div>
                 <div className="game-start">
-                    <p>Bienvenue dans le jeu cos aim lab</p>
-                    <p>Vos essaies effectué aujourd'hui: {attempts}</p>
-                    <button className={"bg-yellow-500 hover:bg-yellow-700 text-white rounded p-2"} disabled={buttonLoading} onClick={async () => {
-                        await syncGame();
-                        await checkIfUseCanPlay();
-                        setGameStarted(true);
-                        // sync game before started it
-                    }}>Commencer le jeu</button>
+                    <h2>Choisissez votre map :</h2>
+                    <div className="map-selection">
+                        <button
+                            className={`map-button ${selectedBackground === Mirage ? 'selected' : ''}`}
+                            onClick={() => setSelectedBackground(Mirage)}
+                        >
+                            Mirage
+                        </button>
+                        <button
+                            className={`map-button ${selectedBackground === Inferno ? 'selected' : ''}`}
+                            onClick={() => setSelectedBackground(Inferno)}
+                        >
+                            Inferno
+                        </button>
+                        <button
+                            className={`map-button ${selectedBackground === Dust ? 'selected' : ''}`}
+                            onClick={() => setSelectedBackground(Dust)}
+                        >
+                            Dust
+                        </button>
+                    </div>
+                    <button
+                        className={"bg-yellow-500 hover:bg-yellow-700 text-white rounded p-2 my-5"}
+                        disabled={buttonLoading || !selectedBackground}  // Disable if no map selected
+                        onClick={async () => {
+                            await syncGame();
+                            await checkIfUseCanPlay();
+                            setGameStarted(true);
+                        }}
+                    >
+                        Commencer le jeu
+                    </button>
                 </div>
             </div>
         );
@@ -249,21 +283,66 @@ const Game = () => {
         );
     }
 
+    const getTargetImage = (type) => {
+        switch (type) {
+            case 'blue':
+                return cibleBleu;
+            case 'yellow':
+                return cibleJaune;
+            case 'orange':
+                return cibleOrange;
+            case 'red':
+                return cibleRouge;
+            default:
+                return null;
+        }
+    };
+
     return (
-        <div className="game">
-            <div className="scoreboard">
+        <div
+            className="game"
+            style={{
+                backgroundImage: `url(${selectedBackground})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                height: '100vh',
+                width: '100vw',
+                position: 'relative'
+            }}
+        >
+            {/* Scoreboard in top-right corner */}
+            <div
+                className="scoreboard"
+                style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: '20px',
+                    backgroundColor: 'white',
+                    padding: '10px 20px',
+                    borderRadius: '10px',
+                    boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
+                }}
+            >
                 <p>Score: {score}</p>
                 <p>Bullet Coins: {bulletCoin}</p>
                 <p>Vie restante(s): {lives}</p>
                 <p>Vitesse du jeu x {gameSpeed.toPrecision(2)}</p>
             </div>
-            <div className="targets">
+            <div className="targets" style={{ height: '100%', width: '100%' }}>
                 {targets.map((target) => (
                     <motion.div
                         key={target.id}
                         className={`target ${target.type}`}
                         onClick={() => handleTargetClick(target)}
-                        style={{ top: `${target.y}%`, left: `${target.x}%` }}
+                        style={{
+                            top: `${target.y}%`,
+                            left: `${target.x}%`,
+                            position: 'absolute',
+                            backgroundImage: `url(${getTargetImage(target.type)})`,
+                            backgroundSize: 'cover',
+                            width: '50px',
+                            height: '50px'
+                        }}
                         initial={{ opacity: 1, scale: 1 }}
                         animate={{ opacity: 0, scale: 0 }}
                         transition={{ duration: 5 / gameSpeed }}
