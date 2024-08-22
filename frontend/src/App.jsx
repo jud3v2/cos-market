@@ -15,7 +15,7 @@ import './App.css';
 import ReactToastify from "./components/ReactToastify.jsx";
 import SteamLogin from "./views/SteamLogin.jsx";
 import CosAimLAb from "./page/CosAimLab.jsx";
-import Inventory from "./views/ProfilPage.jsx";
+import ProfilPage from "./views/ProfilPage.jsx";
 import {
         RecoilRoot,
       } from 'recoil';
@@ -57,7 +57,7 @@ function App() {
                       <Route path="/admin/products" element={adminProtectedRoute(Product)} />
                       <Route path="/product/:id" element={Layout(ProductDetails, ClientLayout, {}, {})} />
                       <Route path={"/steam/login"} element={Layout(SteamLogin, ClientLayout, {}, {})} />
-                      <Route path="/profil" element={Layout(Inventory, ClientLayout, {}, {})} />
+                      <Route path="/profil" element={Layout(ProfilPage, ClientLayout, {}, {})} />
               </Routes>
       </Router>
       </RecoilRoot>

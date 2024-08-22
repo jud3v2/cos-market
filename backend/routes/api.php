@@ -30,6 +30,8 @@ Route::put('/product/unblock/{id}', [ProductController::class, 'unblockProduct']
 // ROUTE CLIENTS
 Route::get('steam/login', [SteamAuthController::class, 'loginWithSteam']);
 Route::get('steam/callback', [SteamAuthController::class, 'steamCallback'])->name('steam.callback');
+Route::get('/steam/profile-url', [SteamAuthController::class, 'getSteamProfileUrl'])->name('steam.profile.url')->withoutMiddleware('user');
+Route::get('/user-profile/{id}', [SteamAuthController::class, 'getUserProfile'])->name('user.profile');
 
 Route::get('/cart-remove/', [CartController::class, 'remove'])->name('cart-remove');
 Route::get('/product/check-available/{id}', [ProductController::class, "isProductBlocked"])->name('product.check-available');
@@ -60,7 +62,6 @@ Route::middleware('user')->group(function () {
     Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTransaction']);
     Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']);
     Route::get('/sync/game/check-if-user-can-play/{id}', [BulletCoinController::class, 'checkIfUserCanPlay']);
-    Route::get('/steam/inventory', [SteamAuthController::class, 'getInventory'])->name('steam.inventory');
 });
 
 // ROUTES AVEC AUTHENTIFICATION ADMIN

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../index.css';
 import { jwtDecode } from 'jwt-decode';
 
 const ProfilePage = () => {
@@ -30,7 +29,6 @@ const ProfilePage = () => {
     if (error) return <p>Error: {error}</p>;
 
     return (
-<main>
         <div>
             {userProfile ? (
                 <div>
@@ -54,7 +52,6 @@ const ProfilePage = () => {
                 <p>Loading...</p>
             )}
         </div>
-        </main>
     );
 };
 
