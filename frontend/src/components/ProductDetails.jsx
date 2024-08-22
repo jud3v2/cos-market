@@ -94,7 +94,7 @@ const ProductDetail = (props) => {
           <div className="flex-1">
             <img src={item.image} alt={item.name} className="mb-4 max-w-full" />
             <div className="items-center mb-4">
-              <AddToCartButton product={product}
+              <AddToCartButton product={enrichedProduct}
                                isInCart={isInCart}
                                isBlocked={isBlocked}
                                blockedUntil={blockedUntil}
