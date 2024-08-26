@@ -87,4 +87,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->role === 'admin';
     }
+
+    public function adresses(): HasMany
+    {
+        return $this->hasMany(AdressBook::class);
+    }
+
+    public function getAdressDefault(): AdressBook
+    {
+        return $this->adresses()->where('isDefault', true)->first();
+    }
 }

@@ -19,6 +19,7 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\SteamAuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\AdressBookController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\VerifyUser;
 
@@ -58,6 +59,7 @@ Route::middleware('user')->group(function () {
     Route::resource('bulletcoin', BulletCoinController::class)->except(['create', 'edit', 'index', 'destroy']);
     Route::resource('transaction', TransactionController::class)->except(['create', 'edit', 'update', 'destroy']);
     Route::resource('order', OrderController::class)->except(['create', 'edit']);
+    Route::resource('adress-book', AdressBookController::class)->except(['create', 'edit']);
     Route::get('/user/orders', [OrderController::class, 'getOrders']);
     Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTransaction']);
     Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']);
