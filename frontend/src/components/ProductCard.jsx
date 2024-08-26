@@ -7,9 +7,7 @@ import { jwtDecode } from "jwt-decode";
 const ProductCard = ({ product }) => {
     const { name, price, skin, created_at, id } = product;
     const imageUrl = skin?.image || 'default-image.png';
-    const rarity = skin?.rarity?.name || 'Rareté non disponible';
     const statTrak = product.stattrak ? 'STATTRAK™' : '';
-    const isNew = product.stock > 0 ? 'NEUVE' : 'UTILISÉE';
     const weaponsName = JSON.parse(skin?.weapons || '{}').name || 'Nom de l\'arme non disponible';
     const patternName = JSON.parse(skin?.pattern || '{}').name || 'Nom du motif non disponible';
     const formattedDate = new Date(created_at).toLocaleDateString();
@@ -53,6 +51,18 @@ const ProductCard = ({ product }) => {
         };
     }, []);
 
+
+    const getWearCategory = (usurePercentage) => {
+        if (usurePercentage >= 0 && usurePercentage < 7) return { category: 'Neuve', color: 'bg-green-500' };
+        if (usurePercentage >= 7 && usurePercentage < 15) return { category: 'Très peu usée', color: 'bg-yellow-500' };
+        if (usurePercentage >= 15 && usurePercentage < 38) return { category: 'Testée sur le terrain', color: 'bg-orange-500' };
+        if (usurePercentage >= 38 && usurePercentage < 45) return { category: 'Usée', color: 'bg-red-500' };
+        if (usurePercentage >= 45 && usurePercentage <= 100) return { category: 'Marquée par les combats', color: 'bg-red-900' };
+        return { category: 'Inconnu', color: 'bg-gray-500' };
+    };
+
+    const { category, color } = getWearCategory(usurePercentage);
+
     return (
         <Link to={`/product/${id}`}
               className="mt-4 border flex w-full max-w-4xl items-center rounded-lg overflow-hidden shadow-xl bg-white">
@@ -70,8 +80,8 @@ const ProductCard = ({ product }) => {
                 </div>
                 <div className="flex justify-between items-center">
                     <div className="flex items-center mb-2">
-                        <span className="inline-block bg-green-500 rounded-full w-3 h-3 mr-2"></span>
-                        <span className="text-sm font-semibold text-gray-700">{isNew}</span>
+                        <span className={`inline-block rounded-full w-3 h-3 mr-2 ${color}`}></span>
+                        <span className="text-sm font-semibold text-gray-700">{category}</span>
                     </div>
                     <span className="text-sm font-semibold text-gray-700">{usage}%</span>
                 </div>
