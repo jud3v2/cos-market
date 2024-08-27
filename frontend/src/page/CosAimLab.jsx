@@ -25,6 +25,7 @@ const Game = () => {
     const [targets, setTargets] = useState([]);
     const [user, setUser] = useState(null);
     const [gameStarted, setGameStarted] = useState(false);
+    const [game, setGame] = useState(null);
     const [loading, setLoading] = useState(true);
     const [buttonLoading, setButtonLoading] = useState(false);
     const [selectedBackground, setSelectedBackground] = useState(null);
@@ -45,7 +46,6 @@ const Game = () => {
         try {
             const btDataResponse = await axios.post('/bulletcoin/', { user_id: user.id });
             const btData = btDataResponse.data;
-            console.log('bulletcoin data fetched');
 
             const ctResponse = await axios.post('/transaction', {
                 user_id: user.id,
@@ -53,7 +53,6 @@ const Game = () => {
                 amount: bulletCoin <= 50 ? bulletCoin : 50,
             });
             const ct = ctResponse.data;
-            console.log('transaction created');
 
             const bcId = btData.id;
             const transactionId = ct.transaction_id;
@@ -67,7 +66,6 @@ const Game = () => {
                 type: "deposit"
             })
                 .then(() => {
-                    console.log('deposit made');
                     toast.success("Vos bullet coins ont été déposés avec succès");
                     setTimeout(() => {
                         window.location.reload();
@@ -108,14 +106,15 @@ const Game = () => {
     }, []);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setTargets((prevTargets) => [
-                ...prevTargets,
-                { id: Date.now(), type: getRandomTargetType(), x: Math.random() * 90, y: Math.random() * 90 },
-            ]);
-        }, 1500 / gameSpeed);
+        if(!gameStarted) return;
+            const interval = setInterval(() => {
+                setTargets((prevTargets) => [
+                    ...prevTargets,
+                    { id: Date.now(), type: getRandomTargetType(), x: Math.random() * 90, y: Math.random() * 90 },
+                ]);
+            }, 1500 / gameSpeed);
 
-        return () => clearInterval(interval);
+            return () => clearInterval(interval);
     }, [gameSpeed]);
 
     useEffect(() => {
@@ -157,6 +156,27 @@ const Game = () => {
         return 'blue';                    // 40% chance to spawn blue target (default)
     };
 
+    const catchError = error => {
+        if(game !== null) {
+            toast.error(error.response.data.message)
+        }
+
+        if(error.response.data.reset) {
+            localStorage.removeItem('attempts');
+            localStorage.removeItem('dateResetAttempt');
+            toast.info("Vos essais ont été réinitialisés, rechargement de la page en cours...");
+            setTimeout(() => {
+                window.reload();
+            }, 2000)
+        } else {
+            if(error.response.data?.message === "User cannot play") {
+                toast.error("Vous avez effectué tous vos essai du jour, vous ne pouvez pas jouer pour le moment");
+            } else {
+                toast.error("Une erreur est survenue lors de la synchronisation du jeu");
+            }
+        }
+    }
+
     const syncGame = async () => {
         const loading = toast.loading("Synchronisation du jeu en cours...");
         try {
@@ -165,13 +185,18 @@ const Game = () => {
                 game_reset_attempts_date: String(dateResetAttempt),
             });
             const game = response.data;
+            setGame(game);
             setAttempts(response.data.game_attempts);
             setDateResetAttempt(new Date(response.data.game_reset_attempts_date).getTime());
             console.log('game synced', game);
+
+            if (game.game_attempts >= 3) {
+                toast.error('Vous avez utilisé tous vos essais du jour');
+            }
         } catch (error) {
-            console.error(error);
-            toast.error("Une erreur est survenue lors de la synchronisation du jeu");
-        } finally {
+            catchError(error);
+        }
+        finally {
             toast.dismiss(loading);
         }
     }
@@ -198,89 +223,19 @@ const Game = () => {
         try {
             const response = await axios.get(`/sync/game/check-if-user-can-play/${user.id}`)
                 .then(res => {
-                    console.log(res.data)
                     return res;
                 })
             const game = response.data;
-            console.log('game fetched', game);
 
             if (game.game_attempts >= 3) {
                 setAttempts(game.game_attempts);
                 setDateResetAttempt(game.game_reset_attempts_date);
             }
         } catch (error) {
-            console.error(error);
-            toast.error("Une erreur est survenue lors de la vérification de vos essais");
+           catchError(error);
         } finally {
             toast.dismiss(loading);
         }
-    }
-
-    if (loading) return <Loading />;
-
-    // Pre-game background selection screen
-    if (!gameStarted) {
-        return (
-            <div className="game">
-                <div className="scoreboard">
-                    <p>Score: {score}</p>
-                    <p>Bullet Coins: {bulletCoin}</p>
-                    <p>Lives: {lives}</p>
-                </div>
-                <div className="game-start">
-                    <h2>Choisissez votre map :</h2>
-                    <div className="map-selection">
-                        <button
-                            className={`map-button ${selectedBackground === Mirage ? 'selected' : ''}`}
-                            onClick={() => setSelectedBackground(Mirage)}
-                        >
-                            Mirage
-                        </button>
-                        <button
-                            className={`map-button ${selectedBackground === Inferno ? 'selected' : ''}`}
-                            onClick={() => setSelectedBackground(Inferno)}
-                        >
-                            Inferno
-                        </button>
-                        <button
-                            className={`map-button ${selectedBackground === Dust ? 'selected' : ''}`}
-                            onClick={() => setSelectedBackground(Dust)}
-                        >
-                            Dust
-                        </button>
-                    </div>
-                    <button
-                        className={"bg-yellow-500 hover:bg-yellow-700 text-white rounded p-2 my-5"}
-                        disabled={buttonLoading || !selectedBackground}  // Disable if no map selected
-                        onClick={async () => {
-                            await syncGame();
-                            await checkIfUseCanPlay();
-                            setGameStarted(true);
-                        }}
-                    >
-                        Commencer le jeu
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    if (attempts >= 3) {
-        const hours = Math.floor((dateResetAttempt - new Date().getTime()) / (60 * 60 * 1000));
-        const minutes = Math.floor((dateResetAttempt - new Date().getTime()) / (60 * 1000) % 60);
-        const seconds = Math.floor((dateResetAttempt - new Date().getTime()) / 1000 % 60);
-
-        return (
-            <div className="game">
-                <div className="scoreboard">
-                    <h3 className={"text-2xl my-5"}>Oops !</h3>
-                </div>
-                <div className="game-start">
-                    <p>Vous avez utilisé tous vos essais du jour</p>
-                    <p>Vous pourrez rejouer dans: {hours} heures {minutes} minutes {seconds} secondes</p>
-                </div>
-            </div>
-        );
     }
 
     const getTargetImage = (type) => {
@@ -298,60 +253,131 @@ const Game = () => {
         }
     };
 
-    return (
-        <div
-            className="game"
-            style={{
-                backgroundImage: `url(${selectedBackground})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                height: '100vh',
-                width: '100vw',
-                position: 'relative'
-            }}
-        >
-            {/* Scoreboard in top-right corner */}
+    if (attempts >= 3) {
+        const hours = Math.floor((dateResetAttempt - new Date().getTime()) / (60 * 60 * 1000));
+        const minutes = Math.floor((dateResetAttempt - new Date().getTime()) / (60 * 1000) % 60);
+        const seconds = Math.floor((dateResetAttempt - new Date().getTime()) / 1000 % 60);
+
+        return (
+            <div className="game">
+                <div className="scoreboard">
+                    <h3 className={"text-2xl my-5"}>Oops ! Vous avez effectué tout vos essais ce jour, merci de bien vouloir patienter</h3>
+                </div>
+                <div className="game-start">
+                    <p>Vous avez utilisé tous vos essais du jour</p>
+                    <p>Vous pourrez rejouer dans: {hours} heures {minutes} minutes {seconds} secondes</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (loading) return <Loading />;
+
+    // Pre-game background selection screen
+    if (!gameStarted) {
+        return (
+            <div className="game">
+                <div className="scoreboard">
+                    <p>Score: {score}</p>
+                    <p>Bullet Coins: {bulletCoin}</p>
+                    <p>Lives: {lives}</p>
+                </div>
+                <div className="game-start">
+                    <h2>Choisissez votre map :</h2>
+                    <div className="map-selection">
+                        <button
+                            className={`map-button ${selectedBackground === Mirage ? 'selected rounded' : ''}`}
+                            onClick={() => setSelectedBackground(Mirage)}
+                        >
+                            Mirage
+                        </button>
+                        <button
+                            className={`map-button ${selectedBackground === Inferno ? 'selected rounded' : ''}`}
+                            onClick={() => setSelectedBackground(Inferno)}
+                        >
+                            Inferno
+                        </button>
+                        <button
+                            className={`map-button ${selectedBackground === Dust ? 'selected rounded' : ''}`}
+                            onClick={() => setSelectedBackground(Dust)}
+                        >
+                            Dust
+                        </button>
+                    </div>
+                    {!selectedBackground && <p className="text-red-500">Veuillez sélectionner une map avant de commencer le jeu</p>}
+                    <button
+                        className={"bg-yellow-500 hover:bg-yellow-700 disabled:bg-gray-500 text-white rounded p-2 my-5"}
+                        disabled={buttonLoading || !selectedBackground}  // Disable if no map selected
+                        onClick={async () => {
+                            if(!selectedBackground) return toast.error("Veuillez sélectionner une map avant de commencer le jeu");
+                            await syncGame();
+                            await checkIfUseCanPlay();
+                            setTimeout(() => {
+                                setGameStarted(true);
+                            }, 1);
+                        }}
+                    >
+                        Commencer le jeu
+                    </button>
+                </div>
+            </div>
+        );
+    }
+        return (
             <div
-                className="scoreboard"
+                className="game"
                 style={{
-                    position: 'absolute',
-                    top: '20px',
-                    right: '20px',
-                    backgroundColor: 'white',
-                    padding: '10px 20px',
-                    borderRadius: '10px',
-                    boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
+                    backgroundImage: `url(${selectedBackground})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    height: '100vh',
+                    width: '100vw',
+                    position: 'relative'
                 }}
             >
-                <p>Score: {score}</p>
-                <p>Bullet Coins: {bulletCoin}</p>
-                <p>Vie restante(s): {lives}</p>
-                <p>Vitesse du jeu x {gameSpeed.toPrecision(2)}</p>
+                {/* Scoreboard in top-right corner */}
+                <div
+                    className="scoreboard"
+                    style={{
+                        position: 'absolute',
+                        top: '20px',
+                        right: '20px',
+                        backgroundColor: 'white',
+                        padding: '10px 20px',
+                        borderRadius: '10px',
+                        boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
+                    }}
+                >
+                    <p>Score: {score}</p>
+                    <p>Bullet Coins: {bulletCoin}</p>
+                    <p>Vie restante(s): {lives}</p>
+                    <p>Vitesse du jeu x {gameSpeed.toPrecision(2)}</p>
+                </div>
+                <div className="targets" style={{ height: '100%', width: '100%' }}>
+                    {targets.map((target) => (
+                        <motion.div
+                            key={target.id}
+                            className={`target ${target.type}`}
+                            onClick={() => handleTargetClick(target)}
+                            style={{
+                                top: `${target.y}%`,
+                                left: `${target.x}%`,
+                                position: 'absolute',
+                                backgroundImage: `url(${getTargetImage(target.type)})`,
+                                backgroundSize: 'cover',
+                                width: '50px',
+                                height: '50px'
+                            }}
+                            initial={{ opacity: 1, scale: 1 }}
+                            animate={{ opacity: 0, scale: 0 }}
+                            transition={{ duration: 5 / gameSpeed }}
+                            onAnimationComplete={() => setTargets(targets.filter((t) => t.id !== target.id))}
+                        />
+                    ))}
+                </div>
             </div>
-            <div className="targets" style={{ height: '100%', width: '100%' }}>
-                {targets.map((target) => (
-                    <motion.div
-                        key={target.id}
-                        className={`target ${target.type}`}
-                        onClick={() => handleTargetClick(target)}
-                        style={{
-                            top: `${target.y}%`,
-                            left: `${target.x}%`,
-                            position: 'absolute',
-                            backgroundImage: `url(${getTargetImage(target.type)})`,
-                            backgroundSize: 'cover',
-                            width: '50px',
-                            height: '50px'
-                        }}
-                        initial={{ opacity: 1, scale: 1 }}
-                        animate={{ opacity: 0, scale: 0 }}
-                        transition={{ duration: 5 / gameSpeed }}
-                        onAnimationComplete={() => setTargets(targets.filter((t) => t.id !== target.id))}
-                    />
-                ))}
-            </div>
-        </div>
-    );
+        );
+
 };
 
 export default Game;
