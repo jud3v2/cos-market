@@ -20,6 +20,7 @@ import {
         RecoilRoot,
       } from 'recoil';
 import PaymentSuccess from "./page/PaymentSuccess.jsx";
+import Logout from "./page/Logout.jsx";
 
 function App() {
   const isAuthenticated = localStorage.getItem('token') !== null;
@@ -60,6 +61,7 @@ function App() {
                       <Route path={"/steam/login"} element={Layout(SteamLogin, ClientLayout, {}, {})} />
                       <Route path="/profil" element={Layout(ProfilPage, ClientLayout, {}, {})} />
                         <Route path="/order/:id/success" element={Layout(PaymentSuccess, ClientLayout, {}, {})} />
+                        <Route path="/logout" element={Layout(Logout, ClientLayout, {}, {})} />
                       <Route path="*" element={Layout(Home, ClientLayout, {}, {})} />
               </Routes>
       </Router>
