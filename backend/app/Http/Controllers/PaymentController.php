@@ -83,6 +83,8 @@ class PaymentController extends Controller
 
             if ($paymentIntent->status === 'succeeded') {
                 $order->status = self::PAYMENT_COMPLETE;
+                $order->payment_id = $paymentIntent->id;
+                $order->payment_method = $paymentIntent->payment_method_types[0];
                 $user = User::find($order->user_id);
                 // vider le panier
                 //TODO: trouver pourquoi le panier ne ce vide pas.
