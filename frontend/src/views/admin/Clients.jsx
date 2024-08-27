@@ -71,6 +71,8 @@ const Clients = () => {
             maxWidth: '85%',
             backgroundColor: '#fff',
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+            overflowX: 'scroll',
+            overflowY: 'scroll'
         },
         overlay: {
             backgroundColor: 'rgba(0, 0, 0, 0.75)',

@@ -64,6 +64,7 @@ Route::middleware('user')->group(function () {
     Route::get('/sync/game/check-if-user-can-play/{id}', [BulletCoinController::class, 'checkIfUserCanPlay']);
     Route::get('/steam/inventory', [SteamAuthController::class, 'getInventory'])->name('steam.inventory');
     Route::post('/payment/success/{id}/success', [PaymentController::class, 'confirmPayment'])->name('payment.confirm');
+    Route::get('inventory', [OrderController::class, 'getInventory'])->name('user.inventory');
 });
 
 // ROUTES AVEC AUTHENTIFICATION ADMIN

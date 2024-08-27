@@ -10,6 +10,7 @@ use App\Services\Cart;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Log;
 
 class OrderController extends Controller
 {
@@ -18,7 +19,7 @@ class OrderController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(['order' => Order::all()]);
+        return response()->json(['order' => Order::with('products')->get()]);
     }
 
     /**
@@ -138,6 +139,8 @@ class OrderController extends Controller
         public
         function show(Order $order): JsonResponse
         {
+            // order with product
+            $order->products = $order->products()->get();
             return response()->json(['order' => $order]);
         }
 
@@ -197,4 +200,45 @@ class OrderController extends Controller
                 return response()->json(['error' => 'Erreur lors de la récupération des commandes'], 500);
             }
         }
+
+    public function getInventory(Request $request): JsonResponse
+    {
+        // Retrieve the authenticated user with their orders and products
+        $user = User::with('inventory.products')->find($request->user->id);
+
+        // Debugging: Check if the user and inventory are retrieved correctly
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        if (!$user->inventory) {
+            return response()->json(['message' => 'No inventory found for user'], 404);
+        }
+
+        // Debugging: Inspect inventory and products
+        $products = $user->inventory->map(function ($order) {
+            return $order->products;
+        })->flatten();
+
+        // Check if products are being retrieved
+        if ($products->isEmpty()) {
+            return response()->json(['message' => 'No products found in inventory'], 404);
+        }
+
+        // Filter paid products
+        $paidProducts = $products->filter(function ($product) {
+            // Debugging: Inspect each product's is_paid status
+            Log::info('Product ID: ' . $product->id . ' - is_paid: ' . $product->paid);
+            return $product->paid;
+        });
+
+        // Debugging: Check if any paid products were found
+        if ($paidProducts->isEmpty()) {
+            return response()->json(['message' => 'No paid products found'], 404);
+        }
+
+        // Convert to array and return as JSON
+        return response()->json(['products' => $paidProducts->values()->toArray()], 200);
     }
+
+}

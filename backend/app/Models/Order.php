@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Order extends Model
 {
@@ -24,5 +25,15 @@ class Order extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function products(): HasManyThrough
+    {
+        return $this->hasManyThrough(Product::class, OrderedProduct::class, 'order_id', 'id', 'id', 'product_id');
+    }
+
+    public function getPaidProducts()
+    {
+        return $this->products()->where('is_paid', true);
     }
 }

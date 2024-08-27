@@ -89,6 +89,13 @@ class PaymentController extends Controller
                 // vider le panier
                 //TODO: trouver pourquoi le panier ne ce vide pas.
                 (new Cart($user->steam_id))->emptyCart();
+
+                // fetch product ordered
+                $products = $order->products;
+                foreach ($products as $product) {
+                    $product->paid = true;
+                    $product->save();
+                }
             } else {
                 $order->status = self::PAYMENT_DECLINED;
             }
