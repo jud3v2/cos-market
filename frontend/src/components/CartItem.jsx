@@ -2,7 +2,7 @@ import React from 'react';
 import {Link} from "react-router-dom";
 
 const CartItem = ({ item, onRemove }) => {
-  const { name, price, skin, quantity } = item;
+  const { name, price, skin } = item;
   const imageUrl = skin?.image || 'default-image.png';
 
   return (

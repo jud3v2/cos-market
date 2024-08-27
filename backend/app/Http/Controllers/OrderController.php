@@ -49,18 +49,18 @@ class OrderController extends Controller
             // Vérifier si le produit a déjà été commandé par l'utilisateur.
             if (OrderedProduct::where('product_id', $product->id)->exists()) {
                 (new Cart($user->steam_id))->fillOutCart();
-                return response()->json(['error' => 'Product already ordered'], 400);
+                return response()->json(['error' => 'Product already ordered', 'product' => $product], 400);
             }
 
             // Vérifier si le produit est déjà dans le panier d'un autre utilisateur.
             if ($product->in_user_id_cart != $user->id && $product->in_user_id_cart != null) {
-                return response()->json(['error' => 'Product not in user cart'], 400);
+                return response()->json(['error' => 'Product not in user cart', 'product' => $product], 400);
             }
 
 
             // si sa fait moins de 15 minute le produit est bloqué.
             if (($product->blocked_at !== null && Carbon::parse($product->blocked_at)->diffInMinutes() < 15) && $product->in_user_id_cart != $user->id) {
-                return response()->json(['error' => 'Product blocked'], 400);
+                return response()->json(['error' => 'Product blocked', 'product' => $product], 400);
             }
 
             //Si aucune personne n'a commandé ce produit
@@ -83,7 +83,7 @@ class OrderController extends Controller
 
         // ensure we have a minimum of 1 product in the cart to create an order
         if ($request->total_price === 0) {
-            return response()->json(['error' => 'No product in the cart'], 404);
+            return response()->json(['error' => 'Votre panier ne dispose de plus aucun produit'], 404);
         }
 
         // création de la commande
@@ -100,15 +100,25 @@ class OrderController extends Controller
 
         // création des produits commandés
         foreach ($products as $product) {
-            $orderedProduct = OrderedProduct::create([
+            OrderedProduct::create([
                 'order_id' => $order->id,
                 'product_id' => $product->id,
             ]);
-
         }
 
-        // vider le panier
-        (new Cart($user->steam_id))->emptyCart();
+        // Ajout de la propriété dynamique, peut-être un skin, une box, ou encore un sticker par exemple.
+        foreach ($products as $product) {
+            if (is_object($product)) {
+                // Déterminer le nom de la propriété dynamiquement
+                $propertyName = $product->type;
+
+                // Vérifier que la propriété existe et est une chaîne valide
+                if (property_exists($product, 'id') && is_string($propertyName)) {
+                    // Assigner dynamiquement la propriété
+                    $product->$propertyName = Product::find($product->id)->getRelatedItem();
+                }
+            }
+        }
 
         // renvoie de la réponse json pour le client, afin de lui notifier que sa commande a bien été créée
         return response()->json([

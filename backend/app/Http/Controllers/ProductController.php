@@ -40,7 +40,8 @@ class ProductController extends Controller
             ]);
         }
 
-        $products = Product::all();
+        // Get all products where is not blocked by a user
+        $products = Product::where('blocked_at', null)->get();
 
         foreach ($products as $product) {
             $product[$product->type] = $product->getRelatedItem();
