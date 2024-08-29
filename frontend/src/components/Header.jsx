@@ -10,6 +10,8 @@ const Header = () => {
   const count = useRecoilValue(cartCountState);
   const [isProfileHovered, setIsProfileHovered] = useState(false);
 
+  const isAuthenticated = !!localStorage.getItem('token'); // Vérifie si le token est présent
+
   const getNavItemClass = (path) => {
     return location.pathname === path ? 'nav-item border-b-4 border-gray-950 ' : 'nav-item';
   };
@@ -34,13 +36,35 @@ const Header = () => {
         >
           <a href="/profil" className={getNavItemClass('/profil')}>PROFIL</a>
           {isProfileHovered && (
-            <a
-              href="/logout"
-              className="absolute mt-8 p-2 bg-gray-200 rounded shadow-lg"
+            <div
+              className="absolute mt-36 p-2 bg-gray-200 rounded shadow-lg bg-yellow-400 z-99"
               style={{ transition: 'opacity 0.5s', opacity: isProfileHovered ? 1 : 0 }}
             >
-              Déconnexion
-            </a>
+              {isAuthenticated ? (
+                <>
+                  <a
+                    href="/logout"
+                    onClick={() => localStorage.removeItem('token')}
+                    className="block px-4 py-2 text-black hover:bg-white"
+                  >
+                    Déconnexion
+                  </a>
+                  <a
+                    href="/cos-aim-lab"
+                    className="block px-4 py-2 text-black hover:bg-white"
+                  >
+                    COS AIM LAB
+                  </a>
+                </>
+              ) : (
+                <a
+                  href="/steam/login"
+                  className="block px-4 py-2 text-black hover:bg-white"
+                >
+                  Connexion
+                </a>
+              )}
+            </div>
           )}
           <a href="/panier" className={getNavItemClass('/panier')}>PANIER ({count})</a>
         </div>
