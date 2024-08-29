@@ -37,23 +37,23 @@ const Header = () => {
           <a href="/profil" className={getNavItemClass('/profil')}>PROFIL</a>
           {isProfileHovered && (
             <div
-              className="absolute mt-36 p-2 bg-gray-200 rounded shadow-lg bg-yellow-400 z-20"
+              className="absolute mt-28 p-2 bg-gray-200 rounded shadow-lg bg-yellow-400 z-20"
               style={{ transition: 'opacity 0.5s', opacity: isProfileHovered ? 1 : 0 }}
             >
               {isAuthenticated ? (
                 <>
+                  <a
+                    href="/cos-aim-lab"
+                    className="block px-4 py-2 text-black hover:bg-white"
+                  >
+                    COS AIM LAB
+                  </a>
                   <a
                     href="/logout"
                     onClick={() => localStorage.removeItem('token')}
                     className="block px-4 py-2 text-black hover:bg-white"
                   >
                     Déconnexion
-                  </a>
-                  <a
-                    href="/cos-aim-lab"
-                    className="block px-4 py-2 text-black hover:bg-white"
-                  >
-                    COS AIM LAB
                   </a>
                 </>
               ) : (
