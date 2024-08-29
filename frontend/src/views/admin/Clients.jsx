@@ -55,7 +55,6 @@ const Clients = () => {
     if (loading) return <p className="text-center text-lg">Loading...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
 
-
     // styles pour le modal
     const customStyles = {
         content: {
@@ -71,8 +70,8 @@ const Clients = () => {
             maxWidth: '85%',
             backgroundColor: '#fff',
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-            overflowX: 'scroll',
-            overflowY: 'scroll'
+            maxHeight: '80vh', 
+            overflowY: 'auto',
         },
         overlay: {
             backgroundColor: 'rgba(0, 0, 0, 0.75)',
