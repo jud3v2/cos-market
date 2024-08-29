@@ -1,178 +1,184 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Modal from 'react-modal';
+import { Box, Button, Modal, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, CircularProgress } from '@mui/material';
+import { Edit, Delete, Visibility } from '@mui/icons-material';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
-Modal.setAppElement('#root');
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '90%',
+  maxWidth: '85%',
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+  borderRadius: 2,
+  maxHeight: '80vh',
+  overflowY: 'auto',
+};
 
 const Clients = () => {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [orders, setOrders] = useState([]);
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [selectedUserName, setSelectedUserName] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [orders, setOrders] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserName, setSelectedUserName] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: '' });
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await axios.get('http://localhost:8000/api/admin/users');
-                if (response.data.success) {
-                    setUsers(response.data.users);
-                } else {
-                    setError('Erreur lors de la récupération des utilisateurs');
-                }
-            } catch (err) {
-                setError('Erreur lors de la récupération des utilisateurs');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUsers();
-    }, []);
-
-    const fetchOrders = async (id, name) => {
-        try {
-            const response = await axios.get(`http://localhost:8000/api/admin/users/${id}/orders`);
-            if (response.data.orders) {
-                setOrders(response.data.orders);
-                setSelectedUser(id);
-                setSelectedUserName(name);
-                setIsModalOpen(true);
-            } else {
-                setError('Erreur lors de la récupération des commandes');
-            }
-        } catch (err) {
-            setError('Erreur lors de la récupération des commandes');
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/admin/users');
+        if (response.data.success) {
+          setUsers(response.data.users);
+        } else {
+          setError('Erreur lors de la récupération des utilisateurs');
         }
+      } catch (err) {
+        setError('Erreur lors de la récupération des utilisateurs');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
+    fetchUsers();
+  }, []);
 
-    if (loading) return <p className="text-center text-lg">Loading...</p>;
-    if (error) return <p className="text-center text-red-500">{error}</p>;
+  const fetchOrders = async (id, name) => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/admin/users/${id}/orders`);
+      if (response.data.orders) {
+        setOrders(response.data.orders);
+        setSelectedUser(id);
+        setSelectedUserName(name);
+        setIsModalOpen(true);
+      } else {
+        setError('Erreur lors de la récupération des commandes');
+      }
+    } catch (err) {
+      setError('Erreur lors de la récupération des commandes');
+    }
+  };
 
-    // styles pour le modal
-    const customStyles = {
-        content: {
-            top: '50%',
-            left: '50%',
-            right: 'auto',
-            bottom: 'auto',
-            marginRight: '-50%',
-            transform: 'translate(-50%, -50%)',
-            padding: '20px',
-            borderRadius: '10px',
-            width: '90%',
-            maxWidth: '85%',
-            backgroundColor: '#fff',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-            maxHeight: '80vh', 
-            overflowY: 'auto',
-        },
-        overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
-        }
-    };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
-    return (
-        <div className="container mx-auto p-4">
-            <h2 className="text-3xl font-bold mb-6 text-center">Liste des clients</h2>
-            <div className="overflow-x-auto mx-auto max-w-7xl">
-                <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-                    <thead>
-                        <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                            <th className="border px-6 py-3 text-left">ID Client</th>
-                            <th className="border px-6 py-3 text-left">Pseudo</th>
-                            <th className="border px-6 py-3 text-left">Email</th>
-                            <th className="border px-6 py-3 text-left">Roles</th>
-                            <th className="border px-6 py-3 text-left">Commandes</th>
-                            <th className="border px-6 py-3 text-left">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="text-gray-600 text-sm font-light">
-                        {users.map((user) => (
-                            <tr key={user.id} className="border-b hover:bg-gray-100">
-                                <td className="border px-6 py-4">{user.id}</td>
-                                <td className="border px-6 py-4">{user.name}</td>
-                                <td className="border px-6 py-4">{user.email}</td>
-                                <td className='border px-6 py-4'>{user.roles}</td>
-                                <td className='border px-6 py-4'>
-                                    <button
-                                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                                        onClick={() => fetchOrders(user.id, user.name)}
-                                    >
-                                        Voir les commandes du client
-                                    </button>
-                                </td>
-                                <td className='border px-6 py-4 space-x-4'>
-                                    <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Editer</button>
-                                    <button className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">Supprimer</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></div>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
-            <Modal
-                isOpen={isModalOpen}
-                onRequestClose={closeModal}
-                contentLabel="Orders Modal"
-                style={customStyles}
-            >
-                <h3 className="text-2xl font-bold mb-4">Commande(s) effectuée(s) par : {selectedUserName}</h3>
+  return (
+    <div className="container mx-auto p-4 mt-4">
+      <Typography variant="h4" component="h2" align="center" gutterBottom>
+        Liste des clients
+      </Typography>
 
-                {orders.length > 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-                            <thead>
-                                <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                                    <th className="border px-6 py-3 text-left">ID Commande</th>
-                                    <th className="border px-6 py-3 text-left">Prix Total</th>
-                                    <th className="border px-6 py-3 text-left">Prix Total TTC</th>
-                                    <th className="border px-6 py-3 text-left">Taxe</th>
-                                    <th className="border px-6 py-3 text-left">Status</th>
-                                    <th className="border px-6 py-3 text-left">Méthode de paiement</th>
-                                    <th className="border px-6 py-3 text-left">ID de paiement</th>
-                                    <th className="border px-6 py-3 text-left">Adresse du client</th>
-                                    <th className="border px-6 py-3 text-left">Date de création</th>
-                                    <th className="border px-6 py-3 text-left">Date de modification</th>
-                                </tr>
-                            </thead>
-                            <tbody className="text-gray-600 text-sm font-light">
-                                {orders.map((order) => (
-                                    <tr key={order.id} className="border-b hover:bg-gray-100">
-                                        <td className="border px-6 py-4">{order.id}</td>
-                                        <td className="border px-6 py-4">{order.total_price}</td>
-                                        <td className="border px-6 py-4">{order.total_price_with_tax}</td>
-                                        <td className="border px-6 py-4">{order.tax}</td>
-                                        <td className="border px-6 py-4">{order.status}</td>
-                                        <td className="border px-6 py-4">{order.payment_method}</td>
-                                        <td className="border px-6 py-4">{order.payment_id}</td>
-                                        <td className="border px-6 py-4">{order.client_address}</td>
-                                        <td className="border px-6 py-4">{order.created_at}</td>
-                                        <td className="border px-6 py-4">{order.updated_at}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                ) : (
-                    <p className="text-center">Cet utilisateur n'a pas encore effectué de commande.</p>
-                )}
+      {/* Conteneur centré pour le tableau */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+        <TableContainer component={Paper} style={{ maxWidth: '80%' }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID Client</TableCell>
+                <TableCell>Pseudo</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Roles</TableCell>
+                <TableCell>Commandes</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id} hover>
+                  <TableCell>{user.id}</TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.roles}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      startIcon={<Visibility />}
+                      onClick={() => fetchOrders(user.id, user.name)}
+                    >
+                      Voir les commandes
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <IconButton color="primary"><Edit /></IconButton>
+                    <IconButton color="secondary"><Delete /></IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
 
-                <div className="mt-4 text-center">
-                    <button className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600" onClick={closeModal}>
-                        Fermer
-                    </button>
-                </div>
-            </Modal>
-        </div>
-    );
+      {/* Modal pour afficher les commandes */}
+      <Modal open={isModalOpen} onClose={closeModal}>
+        <Box sx={style}>
+          <Typography variant="h6" component="h2" gutterBottom>
+            Commande(s) effectuée(s) par : {selectedUserName}
+          </Typography>
+          {orders.length > 0 ? (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>ID Commande</TableCell>
+                    <TableCell>Prix Total</TableCell>
+                    <TableCell>Prix Total TTC</TableCell>
+                    <TableCell>Taxe</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Méthode de paiement</TableCell>
+                    <TableCell>ID de paiement</TableCell>
+                    <TableCell>Adresse du client</TableCell>
+                    <TableCell>Date de création</TableCell>
+                    <TableCell>Date de modification</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {orders.map((order) => (
+                    <TableRow key={order.id} hover>
+                      <TableCell>{order.id}</TableCell>
+                      <TableCell>{order.total_price}</TableCell>
+                      <TableCell>{order.total_price_with_tax}</TableCell>
+                      <TableCell>{order.tax}</TableCell>
+                      <TableCell>{order.status}</TableCell>
+                      <TableCell>{order.payment_method}</TableCell>
+                      <TableCell>{order.payment_id}</TableCell>
+                      <TableCell>{order.client_address}</TableCell>
+                      <TableCell>{order.created_at}</TableCell>
+                      <TableCell>{order.updated_at}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <Typography variant="body1" align="center">Cet utilisateur n'a pas encore effectué de commande.</Typography>
+          )}
+          <Button variant="contained" color="secondary" onClick={closeModal} fullWidth>
+            Fermer
+          </Button>
+        </Box>
+      </Modal>
+
+      {/* Snackbar pour les notifications */}
+      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+        <MuiAlert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </MuiAlert>
+      </Snackbar>
+    </div>
+  );
 };
 
 export default Clients;
