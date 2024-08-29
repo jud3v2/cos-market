@@ -60,6 +60,7 @@ Route::middleware('user')->group(function () {
     Route::resource('transaction', TransactionController::class)->except(['create', 'edit', 'update', 'destroy']);
     Route::resource('order', OrderController::class)->except(['create', 'edit']);
     Route::resource('adress-book', AdressBookController::class)->except(['create', 'edit']);
+    Route::resource('address-book', AdressBookController::class)->except(['create', 'edit']);
     Route::get('/user/orders', [OrderController::class, 'getOrders']);
     Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTransaction']);
     Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']);

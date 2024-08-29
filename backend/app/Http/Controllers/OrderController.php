@@ -29,6 +29,7 @@ class OrderController extends Controller
     {
         $request->validate([
             'user_id' => 'required',
+            'address_id' => 'required',
         ]);
 
         $user = User::find($request->user_id);
@@ -92,6 +93,7 @@ class OrderController extends Controller
         $order->total_price = $request->total_price;
         $order->total_price_with_tax = $request->total_price_with_tax;
         $order->user_id = $user->id;
+        $order->client_address = $request->address_id;
         $order->save();
 
         // si la commande n'a pas été créer on vas retourner une erreur
@@ -227,8 +229,6 @@ class OrderController extends Controller
 
         // Filter paid products
         $paidProducts = $products->filter(function ($product) {
-            // Debugging: Inspect each product's is_paid status
-            Log::info('Product ID: ' . $product->id . ' - is_paid: ' . $product->paid);
             return $product->paid;
         });
 

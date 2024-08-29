@@ -16,7 +16,9 @@ export default function Checkout() {
                 const cart = localStorage.getItem('cart');
                 return cart ? JSON.parse(cart) : [];
         });
-
+        const [addresses, setAddresses] = useState([]); // [...billingAddress]
+        const [isAddressesLoading, setIsAddressesLoading] = useState(true);
+        const [selectedAdresse, setSelectedAdresse] = useState(null); // [...billingAddress
         const [loading, setLoading] = useState(false);
         const [clientSecret, setClientSecret] = useState('');
         const [showBillingAddress, setShowBillingAddress] = useState(false);
@@ -35,11 +37,39 @@ export default function Checkout() {
                 }
         };
 
+        const fetchAddresses = async () => {
+                await axios.get(`${config.backendUrl}/address-book`)
+                    .then((response) => {
+                            setAddresses(response.data);
+
+                            addresses.map(address => {
+                                    if (address.isDefault === 1) {
+                                            setSelectedAdresse(address);
+                                    }
+                            })
+                    })
+                    .catch((error) => {
+                            console.error('Failed to fetch addresses:', error);
+                    })
+                    .finally(() => {
+                            setIsAddressesLoading(false);
+                    })
+        }
+
+        useEffect(() => {
+                (async () => {
+                        await fetchAddresses();
+                })()
+        }, [])
+
         const saveOrder = async () => {
                 let user = localStorage.getItem("token");
                 user = jwtDecode(user);
+                const defaultAddressId = addresses.filter(address => address.isDefault === 1)[0].id;
+                console.log(defaultAddressId, selectedAdresse.id);
                 const response = await axios.post(`${config.backendUrl}/order`, {
                         user_id: user.sub,
+                        address_id: selectedAdresse.id || defaultAddressId,
                 })
                     .then((response) => response.data)
                     .catch((error) => {
@@ -53,7 +83,7 @@ export default function Checkout() {
                         toast(response.error, {
                                 type: "error",
                         });
-                } else if(response.success && response.hasOwnProperty('products')) {
+                } else if (response.success && response.hasOwnProperty('products')) {
                         //TODO: Réactiver la suppression du panier uniquement lorsque le paiement à été validé.
                         /*toast.info("Votre pannier a été vidé", {
                                 type: "info",
@@ -71,12 +101,14 @@ export default function Checkout() {
         useEffect(() => {
                 fetchClientSecret();
 
-                (async () => {
-                        await toast.promise(saveOrder(), {
-                                pending: 'Sauvegarde de votre commande en cours...',
-                        })
-                })()
-        }, []);
+                if(selectedAdresse) {
+                        (async () => {
+                                await toast.promise(saveOrder(), {
+                                        pending: 'Sauvegarde de votre commande en cours...',
+                                })
+                        })()
+                }
+        }, [selectedAdresse]);
 
         const stripePromise = loadStripe(config.stripePublicKey);
 
@@ -98,6 +130,8 @@ export default function Checkout() {
         if (loading) {
                 return <Loading message="Chargement de votre panier"/>;
         }
+
+        console.log(selectedAdresse)
 
         return (
             <div className="checkout-container flex flex-col min-h-screen ">
@@ -134,117 +168,39 @@ export default function Checkout() {
                                                                 className="text-2xl font-bold mb-4 cursor-pointer"
                                                                 onClick={() => setShowBillingAddress(!showBillingAddress)}
                                                             >
-                                                                    Adresse de
+                                                                    Choisissez une adresse de
                                                                     facturation {showBillingAddress ? '▲' : '▼'}
                                                             </h2>
 
                                                             {showBillingAddress && (
-                                                                <form action="#">
-                                                                        <div className="mt-1">
-                                                                                <label htmlFor="name"
-                                                                                       className="block text-sm font-medium text-gray-700">
-                                                                                        Nom
-                                                                                </label>
-                                                                                <div className="mt-1">
-                                                                                        <input
-                                                                                            type="text"
-                                                                                            name="name"
-                                                                                            id="name"
-                                                                                            autoComplete="name"
-                                                                                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                                                        />
-                                                                                </div>
+                                                                <div className="grid grid-cols-1 gap-6">
+                                                                        {addresses?.map((address, index) => {
+                                                                                return (
+                                                                                    <div key={index}>
+                                                                                            <p className={'text-yellow-500'}>{selectedAdresse?.id === address.id ? 'Adresse Sélectionnée' : ''}</p>
+                                                                                            <div
+                                                                                                className={`bg-gray-100 p-4 rounded-lg cursor-pointer ${selectedAdresse?.id === address?.id ? 'border-2 border-yellow-400' : ''}`}
+                                                                                                onClick={() => setSelectedAdresse(address)}>
+                                                                                                    <div
+                                                                                                        className="text-lg font-bold">
+                                                                                                            {address.name} {address.isDefault === 1 ? '(        Default)' : ''}
+                                                                                                    </div>
+                                                                                                    <div>{address.address}</div>
+                                                                                                    <div>{address.zipcode} {address.city}</div>
+                                                                                                    <div>{address.country}</div>
+                                                                                                    <div>{address.phone}</div>
+                                                                                            </div>
+                                                                                    </div>
+                                                                                )
+                                                                        })}
 
-                                                                                <div className="mt-1">
-                                                                                        <label htmlFor="email"
-                                                                                               className="block text-sm font-medium text-gray-700">
-                                                                                                Email
-                                                                                        </label>
-                                                                                        <div className="mt-1">
-                                                                                                <input
-                                                                                                    type="email"
-                                                                                                    name="email"
-                                                                                                    id="email"
-                                                                                                    autoComplete="email"
-                                                                                                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                                                                />
-                                                                                        </div>
-                                                                                </div>
-
-                                                                                <div className="mt-1">
-                                                                                        <label htmlFor="address"
-                                                                                               className="block text-sm font-medium text-gray-700">
-                                                                                                Adresse
-                                                                                        </label>
-                                                                                        <div className="mt-1">
-                                                                                                <input
-                                                                                                    type="text"
-                                                                                                    name="address"
-                                                                                                    id="address"
-                                                                                                    autoComplete="address"
-                                                                                                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                                                                />
-                                                                                        </div>
-                                                                                </div>
-
-                                                                                <div className="mt-1">
-                                                                                        <label htmlFor="city"
-                                                                                               className="block text-sm font-medium text-gray-700">
-                                                                                                Ville
-                                                                                        </label>
-                                                                                        <div className="mt-1">
-                                                                                                <input
-                                                                                                    type="text"
-                                                                                                    name="city"
-                                                                                                    id="city"
-                                                                                                    autoComplete="city"
-                                                                                                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                                                                />
-                                                                                        </div>
-                                                                                </div>
-
-                                                                                <div className="mt-1">
-                                                                                        <label htmlFor="zip"
-                                                                                               className="block text-sm font-medium text-gray-700">
-                                                                                                Code postal
-                                                                                        </label>
-                                                                                        <div className="mt-1">
-                                                                                                <input
-                                                                                                    type="text"
-                                                                                                    name="zip"
-                                                                                                    id="zip"
-                                                                                                    autoComplete="zip"
-                                                                                                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                                                                />
-                                                                                        </div>
-                                                                                </div>
-
-                                                                                <div className="mt-1">
-                                                                                        <label htmlFor="country"
-                                                                                               className="block text-sm font-medium text-gray-700">
-                                                                                                Pays
-                                                                                        </label>
-                                                                                        <div className="mt-1">
-                                                                                                <input
-                                                                                                    type="text"
-                                                                                                    name="country"
-                                                                                                    id="country"
-                                                                                                    autoComplete="country"
-                                                                                                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                                                                />
-                                                                                        </div>
-                                                                                </div>
-
-                                                                                <div
-                                                                                    className="mt-5 flex justify-center w-full mx-auto">
-                                                                                        <button type="submit"
-                                                                                                className="p-2 bg-yellow-500 hover:bg-yellow-700 text-white rounded">
-                                                                                                Enregistrer mon adresse
-                                                                                                de facturation
-                                                                                        </button>
-                                                                                </div>
-                                                                        </div>
-                                                                </form>
+                                                                        {isAddressesLoading && (
+                                                                            <div className="text-center">
+                                                                                    <p>Chargement de vos adresses en
+                                                                                            cours</p>
+                                                                            </div>
+                                                                        )}
+                                                                </div>
                                                             )}
                                                     </div>
                                             </div>
@@ -252,6 +208,11 @@ export default function Checkout() {
                             </div>
 
                             <div className="stripe-form-wrapper mt-6 lg:w-1/2 lg:z-50">
+                                    {selectedAdresse === null && (
+                                        <div className="text-center">
+                                                <p className="text-red-500">Afin de poursuivre la procédure de paiement il vous faut choisir une adresse de facturation.</p>
+                                        </div>
+                                    )}
                                     {clientSecret && (
                                         <Elements stripe={stripePromise} options={options}>
                                                 <CheckoutForm clientSecret={clientSecret} order={order}/>
