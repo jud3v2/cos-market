@@ -37,7 +37,7 @@ const Header = () => {
           <a href="/profil" className={getNavItemClass('/profil')}>PROFIL</a>
           {isProfileHovered && (
             <div
-              className="absolute mt-36 p-2 bg-gray-200 rounded shadow-lg bg-yellow-400 z-99"
+              className="absolute mt-36 p-2 bg-gray-200 rounded shadow-lg bg-yellow-400 z-20"
               style={{ transition: 'opacity 0.5s', opacity: isProfileHovered ? 1 : 0 }}
             >
               {isAuthenticated ? (
