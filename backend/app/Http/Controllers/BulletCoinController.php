@@ -182,4 +182,26 @@ class BulletCoinController extends Controller
         $save = $bulletCoin->update();
         return response()->json(['message' => 'User can play', 'bulletcoin' => $bulletCoin], $save ? 200 : 400);
     }
+
+    public function getTransaction(Request $request): JsonResponse
+    {
+        if($request->user->id) {
+            $user = User::find($request->user->id);
+
+            if(!$user) {
+                goto a;
+            }
+
+            return response()->json([
+                'transactions' => BulletCoinTransaction::where('user_id', $user->id)->get(),
+                'success' => true
+            ]);
+
+        } else {
+            a:
+            return response()->json([
+                'error' => "No user found"
+            ], 404);
+        }
+    }
 }
