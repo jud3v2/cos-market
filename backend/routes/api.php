@@ -56,7 +56,7 @@ Route::middleware('user')->group(function () {
     Route::resource('music-kit', MusicKitsController::class)->except(['create', 'edit']);
     Route::resource('patches', PatchesController::class)->except(['create', 'edit']);
     Route::resource('stickers', StickersController::class)->except(['create', 'edit']);
-    Route::resource('bulletcoin', BulletCoinController::class)->except(['create', 'edit', 'index', 'destroy']);
+    Route::resource('bulletcoin', BulletCoinController::class)->except(['create', 'edit', 'destroy']);
     Route::resource('transaction', TransactionController::class)->except(['create', 'edit', 'update', 'destroy']);
     Route::resource('order', OrderController::class)->except(['create', 'edit']);
     Route::resource('adress-book', AdressBookController::class)->except(['create', 'edit']);

@@ -13,6 +13,16 @@ use Illuminate\Http\Request;
 
 class BulletCoinController extends Controller
 {
+
+    public function index(Request $request)
+    {
+        if($request->user->id) {
+            $bulletCoin = BulletCoin::where('user_id', $request->user->id)->first();
+            return response()->json($bulletCoin, 200);
+        } else {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+    }
     /**
      * Store a newly created resource in storage.
      */

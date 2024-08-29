@@ -30,12 +30,22 @@ class OrderController extends Controller
         $request->validate([
             'user_id' => 'required',
             'address_id' => 'required',
+            'bcreduction' => 'nullable'
         ]);
 
         $user = User::find($request->user_id);
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
+        }
+
+        if($request->bcreduction) {
+            // check balance of user in bulletCoin table if the request bc is greater than balance use only the balance
+            $balance = $user->bulletCoin->amount;
+
+            if($request->bcreduction > $balance) {
+                $request->bcreduction = $balance;
+            }
         }
 
         $products = (new Cart($user->steam_id))->getProducts();
@@ -86,6 +96,13 @@ class OrderController extends Controller
         // ensure we have a minimum of 1 product in the cart to create an order
         if ($request->total_price === 0) {
             return response()->json(['error' => 'Votre panier ne dispose de plus aucun produit'], 404);
+        }
+
+        // if bcreduction is greater than 0, we will use it to reduce the total price by 0.01%
+        if($request->bcreduction > 0) {
+            $bulletCoinValue = 0.0001; // 0.01%
+            $reduction = $request->total_price_with_tax * ($bulletCoinValue * $request->bcreduction);
+            $request->total_price_with_tax -= $reduction;
         }
 
         // création de la commande

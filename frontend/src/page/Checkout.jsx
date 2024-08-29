@@ -27,7 +27,15 @@ export default function Checkout() {
         const bulletCoinReduction = 0;
         const tax = totalPrice * 0.2;
         const finalTotal = totalPrice - bulletCoinReduction + tax;
+        // get url bulletCoins value
+        const urlParams = new URLSearchParams(window.location.search);
 
+        const bcreduction = parseInt(urlParams.get('bulletCoins'), 10) || 0;
+        const bulletCoinReductionParameter = parseFloat(urlParams.get('bulletCoinReduction')) || 0;
+        const finalTotalParameter = parseFloat(urlParams.get('finalTotal')) || 0;
+
+
+        console.log(bcreduction);
         const fetchClientSecret = async () => {
                 try {
                         const response = await axios.post('/payment/create-client-secret', {amount: totalPrice});
@@ -70,6 +78,7 @@ export default function Checkout() {
                 const response = await axios.post(`${config.backendUrl}/order`, {
                         user_id: user.sub,
                         address_id: selectedAdresse.id || defaultAddressId,
+                        bcreduction: bcreduction || 0,
                 })
                     .then((response) => response.data)
                     .catch((error) => {
@@ -154,11 +163,11 @@ export default function Checkout() {
                                                                     = {totalPrice.toFixed(2)}$
                                                             </div>
                                                             <div className="text-2xl font-bold mb-4">BULLET COIN
-                                                                    REDUCTION = {bulletCoinReduction.toFixed(2)}$
+                                                                    REDUCTION = {bulletCoinReductionParameter.toFixed(2)}$
                                                             </div>
                                                             <div className="text-2xl font-bold mb-4">TVA = +20%</div>
                                                             <div className="text-2xl font-bold mt-4">TOTAL
-                                                                    = {finalTotal.toFixed(2)}$
+                                                                    = {finalTotalParameter.toFixed(2)}$
                                                             </div>
                                                     </div>
 
