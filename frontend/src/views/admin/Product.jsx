@@ -195,6 +195,7 @@ const Products = () => {
               <TableCell>Slug</TableCell>
               <TableCell>Prix</TableCell>
               <TableCell>Actif</TableCell>
+              <TableCell>Payé</TableCell>
               <TableCell>Type</TableCell>
               <TableCell>ID d'item</TableCell>
               <TableCell>Actions</TableCell>
@@ -216,6 +217,17 @@ const Products = () => {
                     <Tooltip title="Indisponible">
                       <Info color="secondary" />
                     </Tooltip>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {product.paid ? (
+                      <Tooltip title="Indisponible">
+                        <Info color="secondary" />
+                      </Tooltip>
+                  ) : (
+                      <Tooltip title="Disponible">
+                        <Info color="primary" />
+                      </Tooltip>
                   )}
                 </TableCell>
                 <TableCell>{product.type}</TableCell>
