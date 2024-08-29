@@ -3,7 +3,8 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import '../../index.css';
 
-const ClientLayout = ({ children }) => {
+const ClientLayout = ({ children, props }) => {
+    const propsWithChildren = Object.assign({}, props, { children });
     return (
         <div className="client-layout">
             <Header />

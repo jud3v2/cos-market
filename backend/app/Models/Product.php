@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class Product extends Model
 {
     protected $table = 'product';
-    use HasFactory;
+
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -19,7 +22,11 @@ class Product extends Model
         'type',
         'item_id',
         "stock",
-        'usage'
+        'usage',
+        'image',
+        'in_user_id_cart',
+        'blocked_at',
+        'unblocked_at',
     ];
 
     public function getRelatedItem()

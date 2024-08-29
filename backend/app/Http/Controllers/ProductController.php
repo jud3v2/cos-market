@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreProductRequest;
-use App\Http\Requests\UpdateProductRequest;
+use App\Jobs\UnblockProductJob;
 use App\Models\Product;
 use App\Models\Skin;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -40,7 +40,8 @@ class ProductController extends Controller
             ]);
         }
 
-        $products = Product::all();
+        // Get all products where is not blocked by a user
+        $products = Product::where('blocked_at', null)->get();
 
         foreach ($products as $product) {
             $product[$product->type] = $product->getRelatedItem();
@@ -187,5 +188,69 @@ class ProductController extends Controller
         $product->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function blockProduct(Request $request): JsonResponse
+    {
+        $product = Product::find($request->route('id'));
+
+        if(!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
+        $product->in_user_id_cart = (int) $request->get('user_id');
+
+        $product->blocked_at = Carbon::now('Europe/Paris');
+
+        $product->update(['in_user_id_cart' => $product->in_user_id_cart, 'blocked_at' => $product->blocked_at]);
+        $product->save();
+
+        dispatch(new UnblockProductJob($product))->delay(now()->addMinutes(15));
+
+        return response()->json($product);
+    }
+
+    public function unblockProduct(Request $request, Product $product): JsonResponse
+    {
+        $product->blocked_at = null;
+        $product->unblocked_at = Carbon::now();
+        $product->in_user_id_cart = null;
+        $product->save();
+
+        return response()->json($product);
+    }
+
+    public function isProductBlocked(Request $request): JsonResponse
+    {
+        $product = Product::find($request->route('id'));
+
+        if(!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
+        $blockedAt = Carbon::parse($product->blocked_at, 'Europe/Paris');
+        $unblockTime = Carbon::parse($blockedAt, 'Europe/Paris')->addMinutes(15);
+        $timeLeft = $unblockTime->diffForHumans(Carbon::now('UTC'), true);
+
+        //dd($unblockTime->isAfter($blockedAt), $unblockTime->isBefore($blockedAt), $unblockTime, $blockedAt);
+
+        if($product->blocked_at === null && $product->in_user_id_cart === null) {
+            return response()->json(['message' => 'Product is not blocked', 'isBlocked' => false]);
+        }
+
+        if($product->blocked_at !== null && $blockedAt->isBefore($unblockTime)){
+            return response()->json([
+                'message' => 'Product is blocked because is in a user cart a timeout of blocked product are not done',
+                'availability' => $timeLeft,
+                'isBlocked' => true
+            ]);
+        } elseif($product->blocked_at !== null && $blockedAt->isAfter($unblockTime)) {
+            return response()->json([
+                'message' => 'Product is not blocked',
+                'isBlocked' => false
+            ]);
+        }
+
+        return response()->json(['isBlocked' => $product->blocked_at === null, 'message' => 'Product is not blocked', 'blocked_at' => $product->blocked_at, 'unblocked_at' => $product->unblocked_at, 'availability' => $timeLeft]);
     }
 }

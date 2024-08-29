@@ -53,10 +53,6 @@ class SteamAuthController extends Controller
                         'profile_country' => $player['loccountrycode'] ?? null,
                         'profile_state' => $player['locstatecode'] ?? null,
                         'profile_city' => $player['loccityid'] ?? null,
-                        'profile_street' => null,
-                        'profile_zip' => null,
-                        'profile_phone' => null,
-                        'profile_mobile' => null,
                     ]);
                 } else {
                     $user = User::create([
@@ -69,10 +65,6 @@ class SteamAuthController extends Controller
                         'profile_country' => $player['loccountrycode'] ?? null,
                         'profile_state' => $player['locstatecode'] ?? null,
                         'profile_city' => $player['loccityid'] ?? null,
-                        'profile_street' => null,
-                        'profile_zip' => null,
-                        'profile_phone' => null,
-                        'profile_mobile' => null,
                     ]);
                 }
 
@@ -82,4 +74,27 @@ class SteamAuthController extends Controller
         }
         return redirect('/')->with('error', 'Authentication failed.');
     }
+
+    public function getSteamProfileUrl(Request $request)
+    {
+        $user = User::find($request->query->get('user_id'));
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return response()->json(['profile_url' => $user->profile_url]);
+    }
+
+    public function getUserProfile($id)
+{
+    $user = User::find($id);
+
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+
+    return response()->json($user);
+}
+
 }

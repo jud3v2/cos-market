@@ -15,6 +15,12 @@ import './App.css';
 import ReactToastify from "./components/ReactToastify.jsx";
 import SteamLogin from "./views/SteamLogin.jsx";
 import CosAimLAb from "./page/CosAimLab.jsx";
+import ProfilPage from "./views/ProfilPage.jsx";
+import {
+        RecoilRoot,
+      } from 'recoil';
+import PaymentSuccess from "./page/PaymentSuccess.jsx";
+import Logout from "./page/Logout.jsx";
 
 function App() {
   const isAuthenticated = localStorage.getItem('token') !== null;
@@ -29,13 +35,14 @@ function App() {
     ) : <Page {...pageProps} />;
 }
 
-        const adminProtectedRoute = (Page, layoutProps, pageProps) => {
+        const adminProtectedRoute = (Page, layoutProps = {}, pageProps ={}) => {
                 return <ProtectedRoute isAdmin={isAdmin} isAuthenticated={isAuthenticated} >
                         {Layout(Page, AdminLayout, pageProps, layoutProps)}
                 </ProtectedRoute>
         }
 
   return (
+        <RecoilRoot>
       <Router>
               <Routes>
                       <Route path="/" element={Layout(Home, ClientLayout, {}, {})} />
@@ -52,8 +59,13 @@ function App() {
                       <Route path="/admin/products" element={adminProtectedRoute(Product)} />
                       <Route path="/product/:id" element={Layout(ProductDetails, ClientLayout, {}, {})} />
                       <Route path={"/steam/login"} element={Layout(SteamLogin, ClientLayout, {}, {})} />
+                      <Route path="/profil" element={Layout(ProfilPage, ClientLayout, {}, {})} />
+                        <Route path="/order/:id/success" element={Layout(PaymentSuccess, ClientLayout, {}, {})} />
+                        <Route path="/logout" element={Layout(Logout, ClientLayout, {}, {})} />
+                      <Route path="*" element={Layout(Home, ClientLayout, {}, {})} />
               </Routes>
       </Router>
+      </RecoilRoot>
   );
 }
 

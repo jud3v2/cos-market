@@ -18,3 +18,33 @@
 .nav-item.underline {
   border-bottom: 1px solid black;
 }
+
+.client-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 50;
+  top: 100%; 
+  left: 0;
+  transform: translateY(0);
+  min-width: 150px;
+}
+
+.map-button {
+  padding: 10px;
+  margin: 5px;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.map-button.selected {
+  border: 2px solid #FFD700;
+}

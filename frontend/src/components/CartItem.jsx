@@ -1,9 +1,8 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 
-
 const CartItem = ({ item, onRemove }) => {
-  const { name, price, skin, quantity } = item;
+  const { name, price, skin } = item;
   const imageUrl = skin?.image || 'default-image.png';
 
   return (
@@ -18,7 +17,10 @@ const CartItem = ({ item, onRemove }) => {
         </div>
         <div className="flex justify-between items-center mt-2 border-t pt-2">
           <span className="text-lg font-semibold text-gray-900">{price} $</span>
-          <button onClick={() => onRemove(item.id)} className="bg-red-500 text-white px-4 py-2 rounded">Supprimer</button>
+                {window.location.pathname === '/panier' && (
+                    <button onClick={() => onRemove(item.id)}
+                            className="bg-red-500 text-white px-4 py-2 rounded">Supprimer</button>
+                )}
         </div>
       </div>
     </div>

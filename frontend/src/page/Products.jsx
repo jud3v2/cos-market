@@ -17,9 +17,21 @@ const Products = () => {
   const [skinOptions, setSkinOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
   // Constantes pour le filtrage des produits par prix
-  const [priceRange, setPriceRange] = useState([0, 10000]);
-  const [maxPrice, setMaxPrice] = useState(10000);
+  const [priceRange, setPriceRange] = useState([0, 0]);
+  const [maxPrice, setMaxPrice] = useState();
   const [sortOrder, setSortOrder] = useState('asc');
+  const [isPriceFilterActive, setIsPriceFilterActive] = useState(false);
+  // Constantes pour afficher les filtres actifs
+  const [activeFilters, setActiveFilters] = useState([]);
+
+  const updateActiveFilters = (filter) => {
+    const filters = [];
+    if (searchTerm) filters.push(`Search: ${searchTerm}`);
+    if (selectedCategory) filters.push(`Category: ${selectedCategory}`);
+    if (selectedSkin) filters.push(`Skin: ${selectedSkin}`);
+    if (isPriceFilterActive) filters.push(`Price: ${priceRange[0]} - ${priceRange[1]}`);
+    setActiveFilters(filters);
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -89,11 +101,67 @@ const Products = () => {
 
   const handlePriceChange = (value) => {
     setPriceRange(value);
+    setIsPriceFilterActive(true);
   };
 
   const handleSortChange = (value) => {
     setSortOrder(value === 'Croissant' ? 'asc' : 'desc');
   };
+
+  const removeFilter = (filter) => {
+    const newFilters = activeFilters.filter(f => f !== filter);
+    setActiveFilters(newFilters);
+
+    if (filter.startsWith('Search:')) {
+      setSearchTerm('');
+    } else if (filter.startsWith('Category:')) {
+      setSelectedCategory('');
+    } else if (filter.startsWith('Skin:')) {
+      setSelectedSkin('');
+    } else if (filter.startsWith('Price:')) {
+      setPriceRange([0, maxPrice]);
+      setIsPriceFilterActive(false);
+    }
+  };
+
+  useEffect(() => {
+    updateActiveFilters();
+  }, [searchTerm, selectedCategory, selectedSkin, priceRange]);
+
+  useEffect(() => {
+    const filteredSkins = new Set();
+    products.forEach(product => {
+      const skin = product.skin;
+      const weaponsString = skin?.weapons;
+      const categoryString = skin?.category;
+      let category = null;
+      let weapon = null;
+
+      if (categoryString) {
+        try {
+          category = JSON.parse(categoryString);
+        } catch (error) {
+          console.error('Error parsing category:', error);
+        }
+      }
+
+      if (weaponsString) {
+        try {
+          weapon = JSON.parse(weaponsString);
+        } catch (error) {
+          console.error('Error parsing weapons:', error);
+        }
+      }
+
+      if (!selectedCategory || (category && category.name.toLowerCase() === selectedCategory.toLowerCase())) {
+        if (weapon) {
+          filteredSkins.add(weapon.name);
+        }
+      }
+    });
+
+    setSkinOptions(['Tout afficher', ...Array.from(filteredSkins)]);
+  }, [selectedCategory, products]);
 
   if (loading) return <Loading message={"Chargement des produits disponible"}/>;
   if (error) return <div>Error: {error.message}</div>;
@@ -109,7 +177,7 @@ const Products = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 z-10">
             <Dropdown
               label="TYPE D'ARMES"
               options={categoryOptions}
@@ -131,6 +199,20 @@ const Products = () => {
             />
             <Dropdown label="AFFICHAGE" options={['Affi 1', 'Affi 2', 'Affi 3']}/>
           </div>
+        </div>
+        <div className='mb-4 gap-4 flex flex-wrap'>
+          {activeFilters.map((filter, index) => (
+            <span key={index} className='bg-yellow-300 text-black px-2 py-2 rounded-md'>
+              {filter}
+              <button
+                className="ml-2"
+                onClick={() => removeFilter(filter)}
+                aria-label={`Remove ${filter}`}
+              >
+                &times;
+              </button>
+            </span>
+          ))}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

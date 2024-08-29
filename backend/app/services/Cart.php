@@ -59,6 +59,17 @@ class Cart
         $this->products = [];
     }
 
+    public function fillOutCart(): self
+    {
+        CartModel::where('steam_id', $this->steamId)->update([
+            'products' => json_encode([])
+        ]);
+
+        $this->products = [];
+
+        return $this;
+    }
+
     public function save(): bool
     {
         if ($c = CartModel::where('steam_id', $this->steamId)->first()) {
@@ -80,5 +91,10 @@ class Cart
         }
 
         return $total;
+    }
+
+    public function getProducts()
+    {
+        return $this->products;
     }
 }
