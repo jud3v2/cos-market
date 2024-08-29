@@ -1,10 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 
 const ProfilePage = () => {
     const [userProfile, setUserProfile] = useState(null);
     const [error, setError] = useState(null);
+    const [addressBook, setAddressBook] = useState([]);
+    const [newAddress, setNewAddress] = useState({
+        name: '',
+        address: '',
+        city: '',
+        zipcode: '',
+        country: '',
+        isDefault: false,
+    });
+    const [editMode, setEditMode] = useState(null);
+    const [editAddress, setEditAddress] = useState({});
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [isAdding, setIsAdding] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(null);
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -23,51 +38,287 @@ const ProfilePage = () => {
             }
         };
 
+        const fetchAddressBook = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get('http://localhost:8000/api/adress-book', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                setAddressBook(response.data);
+            } catch (err) {
+                setError(err.message);
+            }
+        };
+
         fetchUserProfile();
+        fetchAddressBook();
     }, []);
+
+    const handleAddAddress = async () => {
+        setIsAdding(true);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.post('http://localhost:8000/api/adress-book', newAddress, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            // Mettre à jour l'état de toutes les adresses
+            const updatedAddressBook = addressBook.map(address => ({
+                ...address,
+                isDefault: false
+            }));
+
+            setAddressBook([...updatedAddressBook, response.data]);
+
+            setNewAddress({
+                name: '',
+                address: '',
+                city: '',
+                zipcode: '',
+                country: '',
+                isDefault: false,
+            });
+            setShowAddForm(false);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsAdding(false);
+        }
+    };
+
+    const handleDeleteAddress = async (id) => {
+        setIsDeleting(id);
+        try {
+            const token = localStorage.getItem('token');
+            await axios.delete(`http://localhost:8000/api/adress-book/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setAddressBook(addressBook.filter(address => address.id !== id));
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsDeleting(null);
+        }
+    };
+
+    const handleEditAddress = async (id) => {
+        setIsEditing(true);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.put(`http://localhost:8000/api/adress-book/${id}`, editAddress, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            // Mettre à jour l'état de toutes les adresses
+            const updatedAddressBook = addressBook.map(address =>
+                address.id === id ? response.data : { ...address, isDefault: response.data.isDefault ? false : address.isDefault }
+            );
+            setAddressBook(updatedAddressBook);
+            setEditMode(null);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsEditing(false);  
+        }
+    };
+
+    const handleEditClick = (address) => {
+        setEditMode(address.id);
+        setEditAddress(address);
+    };
 
     if (error) return <p>Error: {error}</p>;
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-    {userProfile ? (
-        <div className="flex flex-col items-center w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
-            <img src={userProfile.avatar} alt="Steam Avatar" className="rounded-full mb-4"
-                 style={{width: '150px', height: '150px'}}/>
-            <h2 className="text-2xl font-bold mb-2">{userProfile.profile_name}</h2>
-            <p className="text-gray-600 mb-2"><strong>Pays :</strong> {userProfile.country || 'Inconnu'}</p>
-            <p className="text-gray-600 mb-2"><strong>Adresse email :</strong> {userProfile.email || 'Inconnu'}</p>
-            <p className="text-gray-600 mb-4"><strong>Steam ID :</strong> {userProfile.steam_id || 'Inconnu'}</p>
-            <a href={`${userProfile.profile_url}/inventory/#730`} target="_blank" rel="noopener noreferrer">
-                <button
-                    className="bg-yellow-400 hover:bg-orange-400 text-white text-xl font-bold py-3 px-10 rounded-lg mb-4">
-                    Voir mon inventaire Counter Strike 2
-                </button>
-            </a>
-            <a href={userProfile.profile_url} target="_blank" rel="noopener noreferrer">
-                <button
-                    className="bg-yellow-400 hover:bg-orange-400 text-white text-xl font-bold py-3 px-10 rounded-lg">
-                    Voir mon profil Steam
-                </button>
-            </a>
-            <a href={''} target="_blank" rel="noopener noreferrer" className={'my-3'}>
-                <button
-                    className="bg-yellow-400 hover:bg-orange-400 text-white text-xl font-bold py-3 px-10 rounded-lg">
-                    Gestion de mes adresses
-                </button>
-            </a>
-            <a href={''} target="_blank" rel="noopener noreferrer" className={'my-3'}>
-                <button
-                    className="bg-yellow-400 hover:bg-orange-400 text-white text-xl font-bold py-3 px-10 rounded-lg">
-                    Gestion de mes commandes
-                </button>
-            </a>
-        </div>
-    ) : (
-        <p>Loading...</p>
-    )}
-        </div>
+        <div className="flex items-start justify-center min-h-screen bg-gray-100 p-6">
+            {userProfile ? (
+                <>
+                    {/* Colonne Profil */}
+                    <div className="w-1/3 bg-white p-6 rounded-lg shadow-lg mr-6">
+                        <img src={userProfile.avatar} alt="Steam Avatar" className="rounded-full mb-4"
+                            style={{ width: '150px', height: '150px' }} />
+                        <h2 className="text-2xl font-bold mb-2">{userProfile.profile_name}</h2>
+                        <p className="text-gray-600 mb-2"><strong>Pays :</strong> {userProfile.country || 'Inconnu'}</p>
+                        <p className="text-gray-600 mb-2"><strong>Adresse email :</strong> {userProfile.email || 'Inconnu'}</p>
+                        <p className="text-gray-600 mb-4"><strong>Steam ID :</strong> {userProfile.steam_id || 'Inconnu'}</p>
+                        <a href={`${userProfile.profile_url}/inventory/#730`} target="_blank" rel="noopener noreferrer">
+                            <button className="bg-yellow-400 hover:bg-orange-400 text-white text-xl font-bold py-3 px-10 rounded-lg mb-4">
+                                Voir mon inventaire Counter Strike 2
+                            </button>
+                        </a>
+                        <a href={userProfile.profile_url} target="_blank" rel="noopener noreferrer">
+                            <button className="bg-yellow-400 hover:bg-orange-400 text-white text-xl font-bold py-3 px-10 rounded-lg">
+                                Voir mon profil Steam
+                            </button>
+                        </a>
+                    </div>
 
+                    {/* Colonne Adress Book */}
+                    <div className="w-2/3 bg-white p-6 rounded-lg shadow-lg">
+                        <h3 className="text-xl font-bold mb-4">Mes adresses de facturation :</h3>
+                        {addressBook && addressBook.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {addressBook.map((address) => (
+                                    <div key={address.id} className="bg-gray-100 p-4 rounded-lg shadow-md">
+                                        {editMode === address.id ? (
+                                            <>
+                                                {/* Mode d'édition */}
+                                                <input
+                                                    type="text"
+                                                    value={editAddress.name}
+                                                    onChange={(e) => setEditAddress({ ...editAddress, name: e.target.value })}
+                                                    className="border p-2 rounded w-full mb-2"
+                                                    placeholder="Nom"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={editAddress.address}
+                                                    onChange={(e) => setEditAddress({ ...editAddress, address: e.target.value })}
+                                                    className="border p-2 rounded w-full mb-2"
+                                                    placeholder="Adresse"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={editAddress.city}
+                                                    onChange={(e) => setEditAddress({ ...editAddress, city: e.target.value })}
+                                                    className="border p-2 rounded w-full mb-2"
+                                                    placeholder="Ville"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={editAddress.zipcode}
+                                                    onChange={(e) => setEditAddress({ ...editAddress, zipcode: e.target.value })}
+                                                    className="border p-2 rounded w-full mb-2"
+                                                    placeholder="Code postal"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={editAddress.country}
+                                                    onChange={(e) => setEditAddress({ ...editAddress, country: e.target.value })}
+                                                    className="border p-2 rounded w-full mb-2"
+                                                    placeholder="Pays"
+                                                />
+                                                <div className="flex items-center mb-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={editAddress.isDefault}
+                                                        onChange={(e) => setEditAddress({ ...editAddress, isDefault: e.target.checked })}
+                                                        className="mr-2"
+                                                    />
+                                                    <label>Définir comme adresse par défaut</label>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <button onClick={() => handleEditAddress(address.id)} className="bg-green-500 text-white px-4 py-2 rounded" disabled={isEditing}>
+                                                        {isEditing ? 'Enregistrement...' : 'Enregistrer'}
+                                                    </button>
+                                                    <button onClick={() => setEditMode(null)} className="bg-gray-500 text-white px-4 py-2 rounded ml-2">
+                                                        Annuler
+                                                    </button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {/* Mode d'affichage */}
+                                                <h4 className="text-lg font-semibold mb-2">{address.name} {address.isDefault && <span className="text-yellow-500 font-bold">(Par défaut)</span>}</h4>
+                                                <p className="text-gray-600 mb-1">{address.address}</p>
+                                                <p className="text-gray-600 mb-1">{address.city}, {address.zipcode}</p>
+                                                <p className="text-gray-600 mb-2">{address.country}</p>
+                                                <div className="flex justify-between mt-4">
+                                                    <button onClick={() => handleEditClick(address)} className="bg-blue-500 text-white px-4 py-2 rounded">
+                                                        Modifier
+                                                    </button>
+                                                    <button onClick={() => handleDeleteAddress(address.id)} className="bg-red-500 text-white px-4 py-2 rounded" disabled={isDeleting === address.id}>
+                                                        {isDeleting === address.id ? 'Suppression...' : 'Supprimer'}
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-gray-600">Aucune adresse trouvée.</p>
+                        )}
+
+                        {/* Bouton pour afficher/masquer le formulaire d'ajout d'adresse */}
+                        <button
+                            onClick={() => setShowAddForm(!showAddForm)}
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4"
+                        >
+                            {showAddForm ? 'Masquer le formulaire' : 'Ajouter une nouvelle adresse'}
+                        </button>
+
+                        {/* Formulaire pour ajouter une nouvelle adresse */}
+                        {showAddForm && (
+                            <div className="w-full mt-6">
+                                <input
+                                    type="text"
+                                    placeholder="Nom de l'adresse (Ex: Domicile, Maison, Bureau)"
+                                    value={newAddress.name}
+                                    onChange={(e) => setNewAddress({ ...newAddress, name: e.target.value })}
+                                    className="border p-2 rounded w-full mb-2"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Adresse"
+                                    value={newAddress.address}
+                                    onChange={(e) => setNewAddress({ ...newAddress, address: e.target.value })}
+                                    className="border p-2 rounded w-full mb-2"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Ville"
+                                    value={newAddress.city}
+                                    onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                                    className="border p-2 rounded w-full mb-2"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Code postal"
+                                    value={newAddress.zipcode}
+                                    onChange={(e) => setNewAddress({ ...newAddress, zipcode: e.target.value })}
+                                    className="border p-2 rounded w-full mb-2"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Pays"
+                                    value={newAddress.country}
+                                    onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })}
+                                    className="border p-2 rounded w-full mb-2"
+                                />
+                                <div className="flex items-center mb-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={newAddress.isDefault}
+                                        onChange={(e) => setNewAddress({ ...newAddress, isDefault: e.target.checked })}
+                                        className="mr-2"
+                                    />
+                                    <label>Définir comme adresse par défaut</label>
+                                </div>
+                                <button
+                                    onClick={handleAddAddress}
+                                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+                                    disabled={isAdding}
+                                >
+                                    {isAdding ? 'Ajout en cours...' : 'Ajouter l\'adresse'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </>
+            ) : (
+                <p>Loading...</p>
+            )}
+        </div>
     );
 };
 

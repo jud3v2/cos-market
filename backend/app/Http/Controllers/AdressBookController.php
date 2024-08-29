@@ -10,11 +10,13 @@ class AdressBookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Ici on récupère l'adresse par défaut
-        $adressBook = AdressBook::where('isDefault', true)->first();
-        return response()->json($adressBook);
+        $user = $request->user;
+
+        // Récupérer toutes les adresses de l'utilisateur authentifié
+        $adressBooks = AdressBook::where('user_id', $user->id)->get();
+        return response()->json($adressBooks);
     }
 
     /**
@@ -30,24 +32,39 @@ class AdressBookController extends Controller
             'country' => 'required',
         ]);
 
-        // Ici on stocke l'adresse par défaut + si l'adresse est par défaut on enlève l'ancinne adresse par défaut
-        $adressBook = AdressBook::create($request->all());
+        $user = $request->user;
 
-        if ($adressBook->isDefault) {
-            $getallAdressBook = AdressBook::where('user_id', $adressBook->user_id)->where('id', '!=', $adressBook->id)->get();
-            foreach ($getallAdressBook as $getallAdressBook) {
-                $getallAdressBook->isDefault = false;
-                $getallAdressBook->save();
-            }
+        // Si l'adresse est définie par défaut, désactiver les autres adresses par défaut de l'utilisateur
+        if ($request->isDefault) {
+            AdressBook::where('user_id', $user->id)
+                ->update(['isDefault' => false]);
         }
+
+        $adressBook = AdressBook::create([
+            'user_id' => $user->id,
+            'name' => $request->name,
+            'address' => $request->address,
+            'city' => $request->city,
+            'zipcode' => $request->zipcode,
+            'country' => $request->country,
+            'isDefault' => $request->isDefault ?? false,
+        ]);
+
         return response()->json($adressBook);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(AdressBook $adressBook)
+    public function show(Request $request, AdressBook $adressBook)
     {
+        // Récupérer l'utilisateur authentifié du middleware
+        $user = $request->user;
+
+        if ($adressBook->user_id !== $user->id) {
+            return response()->json(['error' => 'Non autorisé.'], 403);
+        }
+
         return response()->json($adressBook);
     }
 
@@ -64,7 +81,21 @@ class AdressBookController extends Controller
             'country' => 'required',
         ]);
 
-        // Ici on met à jour l'adresse par défaut
+        // Récupérer l'utilisateur authentifié du middleware
+        $user = $request->user;
+
+        if ($adressBook->user_id !== $user->id) {
+            return response()->json(['error' => 'Non autorisé.'], 403);
+        }
+
+        // Si l'adresse est définie par défaut, désactiver les autres adresses par défaut de l'utilisateur
+        if ($request->isDefault) {
+            AdressBook::where('user_id', $user->id)
+                ->where('id', '!=', $adressBook->id)
+                ->update(['isDefault' => false]);
+        }
+
+        // Mettre à jour l'adresse
         $adressBook->update($request->all());
         return response()->json($adressBook);
     }
@@ -72,8 +103,15 @@ class AdressBookController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(AdressBook $adressBook)
+    public function destroy(Request $request, AdressBook $adressBook)
     {
+        // Récupérer l'utilisateur authentifié du middleware
+        $user = $request->user;
+
+        if ($adressBook->user_id !== $user->id) {
+            return response()->json(['error' => 'Non autorisé.'], 403);
+        }
+
         $adressBook->delete();
         return response()->json(['message' => 'Adresse supprimée avec succès'], 204);
     }
