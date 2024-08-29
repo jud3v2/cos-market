@@ -74,4 +74,5 @@ Route::middleware('user')->group(function () {
 Route::middleware('admin')->group(function () {
     Route::get('/admin/users', [AdminAuthController::class, 'getAllUsers']);
     Route::get('/admin/users/{id}/orders', [OrderController::class, 'getOrdersForUser']);
+    Route::get('/admin/products', [ProductController::class, 'getProductsAdmin']);
 });

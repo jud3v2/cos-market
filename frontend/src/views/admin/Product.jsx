@@ -53,7 +53,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/product');
+      const response = await axios.get('http://localhost:8000/api/admin/products');
       if (response.data.success) {
         setProducts(response.data.products);
       } else {
