@@ -12,6 +12,7 @@ const ProfilePage = () => {
     const [error, setError] = useState(null);
     const [isAddressBookLoading, setIsAddressBookLoading] = useState(true);
     const [isBCTransactionLoading, setIsBCTransactionLoading] = useState(true);
+    const [inventoryLoading, setInventoryLoading] = useState(true);
     const [bcTransaction, setBcTransaction] = useState([]);
     const [isBCLoading, setIsBCLoading] = useState(true);
     const [addressBook, setAddressBook] = useState([]);
@@ -59,6 +60,9 @@ const ProfilePage = () => {
                 setInventory(response.data.products || []);
             } catch (err) {
                 setInventory([]);
+            }
+            finally {
+                setInventoryLoading(false);
             }
         };
 
@@ -248,6 +252,8 @@ const ProfilePage = () => {
                                             </div>
                                         ))}
                                     </div>
+                                ) : inventoryLoading ? (
+                                    <p className="text-gray-600">Chargement de votre inventaire en cours...</p>
                                 ) : (
                                     <p className="text-gray-600">Aucun produit dans votre inventaire.</p>
                                 )}
