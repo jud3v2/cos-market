@@ -254,6 +254,11 @@ class OrderController extends Controller
             return response()->json(['message' => 'No paid products found'], 404);
         }
 
+        foreach ($paidProducts as $product) {
+            $type = $product->type;
+            $product->$type = $product->getRelatedItem();
+        }
+
         // Convert to array and return as JSON
         return response()->json(['products' => $paidProducts->values()->toArray()], 200);
     }

@@ -240,7 +240,7 @@ const ProfilePage = () => {
                                         {inventory.map(product => (
                                             <div key={product.id} className="flex flex-col items-center">
                                                 <img
-                                                    src={getImageForProduct(product.name)}
+                                                    src={product.skin.image}
                                                     alt={product.name}
                                                     className="w-24 h-24 object-fit"
                                                 />

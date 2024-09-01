@@ -40,7 +40,7 @@ export default function PaymentSuccess() {
 
         return (
                 <div>
-                        <h1>Payment Success</h1>
+                        <h1>Vérification du paiement en cours...</h1>
                 </div>
         );
 }
