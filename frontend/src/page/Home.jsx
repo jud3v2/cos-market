@@ -1,55 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import Card from '../components/Card';
-import Title from '../components/Title';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import '../index.css';
-import Loading from "../components/Loading.jsx";
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/product')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (Array.isArray(data)) {
-          setProducts(data);
-        } else if (Array.isArray(data.products)) {
-          setProducts(data.products);
-        } else {
-          setError(new Error('Invalid API response structure'));
-        }
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching products:', error);
-        setError(error);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
-    return <Loading message={"Bienvenue Chez CosMarket"} />;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-grow bg-white p-6">
-        <Title text="Meilleures offres" />
-        <div className="flex flex-wrap justify-center">
-          {products.map(product => <Card key={product.id} product={product} />)}
-        </div>
-      </main>
+    <div className="relative flex items-center justify-center min-h-screen">
+      {/* Vidéo en arrière-plan */}
+      <video
+        className="absolute top-0 left-0 w-full h-full object-cover -z-10"
+        src="/videos/home-video.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+      />
+
+      {/* Overlay sombre pour effet d'ombre */}
+      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-50 -z-10"></div>
+
+      {/* Conteneur pour le titre et la phrase d'accroche */}
+      <div className="relative z-20 flex flex-col items-center justify-center text-center">
+        <h1 className="text-8xl font-bold mb-4 text-yellow-500">Bienvenue sur COSMARKET</h1>
+        <p className="text-2xl mb-6 text-white">
+          Plongez dans l'univers des skins exclusifs et trouvez votre style unique !
+        </p>
+
+        {/* Bouton pour accéder à la page des produits */}
+        <Link to="/produits" className="bg-yellow-500 hover:bg-yellow-600 text-white text-xl font-bold py-10 px-10 rounded-lg transition duration-300 ease-in-out">
+          Découvrez nos skins en vente
+        </Link>
+      </div>
     </div>
   );
 };
