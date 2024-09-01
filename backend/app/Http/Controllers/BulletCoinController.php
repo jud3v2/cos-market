@@ -13,6 +13,16 @@ use Illuminate\Http\Request;
 
 class BulletCoinController extends Controller
 {
+
+    public function index(Request $request)
+    {
+        if($request->user->id) {
+            $bulletCoin = BulletCoin::where('user_id', $request->user->id)->first();
+            return response()->json($bulletCoin, 200);
+        } else {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+    }
     /**
      * Store a newly created resource in storage.
      */
@@ -171,5 +181,27 @@ class BulletCoinController extends Controller
         $bulletCoin->game_reset_attempts_date = null;
         $save = $bulletCoin->update();
         return response()->json(['message' => 'User can play', 'bulletcoin' => $bulletCoin], $save ? 200 : 400);
+    }
+
+    public function getTransaction(Request $request): JsonResponse
+    {
+        if($request->user->id) {
+            $user = User::find($request->user->id);
+
+            if(!$user) {
+                goto a;
+            }
+
+            return response()->json([
+                'transactions' => BulletCoinTransaction::where('user_id', $user->id)->get(),
+                'success' => true
+            ]);
+
+        } else {
+            a:
+            return response()->json([
+                'error' => "No user found"
+            ], 404);
+        }
     }
 }

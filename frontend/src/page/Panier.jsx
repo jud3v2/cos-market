@@ -3,15 +3,36 @@ import CartItem from "../components/CartItem";
 import CartService from "../services/cartService";
 import "../index.css";
 import { Link } from "react-router-dom";
+import config from "../config/index.js";
+import axios from "axios";
+import {toast} from "react-toastify";
 
 const Panier = () => {
   const [cartItems, setCartItems] = useState([]);
   const [bulletCoins, setBulletCoins] = useState(0);
-  const bulletCoinValue = 1;
+  const [bulletCoinData, setBulletCoinData] = useState([]); // [bulletCoinValue, bulletCoinReduction, finalTotal]
+  const bulletCoinValue = 0.0001; // Valeur de réduction par bullet coin (0,01%)
+
+  const fetchBulletCoinData = async () => {
+     await axios.get(`${config.backendUrl}/bulletcoin`)
+         .then(response => {
+              setBulletCoinData(response.data);
+         })
+         .catch(error => (
+             console.error(error)
+         ))
+         .finally(() => {
+
+         });
+  }
 
   useEffect(() => {
     const fetchedCartItems = CartService.getCart();
     setCartItems(fetchedCartItems);
+
+    (async () => {
+      await fetchBulletCoinData();
+    }) ()
   }, []);
 
   const handleRemove = async (id) => {
@@ -20,7 +41,6 @@ const Panier = () => {
 
     localStorage.setItem("cart", JSON.stringify(updatedCartItems));
 
-    const steamId = localStorage.getItem("steam_id");
     const response = await CartService.removeItem(id);
 
     if (!response.success) {
@@ -31,16 +51,25 @@ const Panier = () => {
   const totalPrice = cartItems.reduce((total, item) => total + item.price, 0);
   const tax = totalPrice * 0.2;
   const priceWithTax = totalPrice + tax;
-  const bulletCoinReduction = bulletCoins * bulletCoinValue;
+// Calcul de la réduction totale due aux bullet coins
+  const bulletCoinReduction = priceWithTax * (bulletCoinValue * bulletCoins);
+
+// Calcul du prix final après application de la réduction des bullet coins
   const finalTotal = priceWithTax - bulletCoinReduction;
 
   const incrementBulletCoins = () => {
+    if(bulletCoins >= bulletCoinData?.amount) {
+      toast.error("Vous ne pouvez pas avoir plus de bullet coins que ceux disponibles: " + bulletCoinData?.amount)
+      return
+    }
     setBulletCoins(bulletCoins + 1);
   };
 
   const decrementBulletCoins = () => {
     if (bulletCoins > 0) {
       setBulletCoins(bulletCoins - 1);
+    } else if(bulletCoins === 0) {
+      toast.error("Vous ne pouvez pas avoir moins de 0 bullet coins.")
     }
   };
 
@@ -67,7 +96,10 @@ const Panier = () => {
                 Prix avec TVA (20%) = {priceWithTax.toFixed(2)}$
               </div>
 
-              <div className="text-2xl font-bold mb-4">BULLET COINS</div>
+              <div className="text-2xl font-bold mb-4">BULLET COINS Disponible</div>
+                <div className="text-2xl font-bold mb-4">
+                    {bulletCoinData?.amount} Bullet Coins
+                </div>
               <div className="flex items-center mb-4">
                 <button
                   onClick={decrementBulletCoins}
@@ -75,7 +107,7 @@ const Panier = () => {
                 >
                   -
                 </button>
-                <div className="px-4 py-2 text-lg">{bulletCoins}</div>
+                <input className="px-4 py-2 text-lg" value={bulletCoins} onChange={e => setBulletCoins(parseInt(e.target.value))}/>
                 <button
                   onClick={incrementBulletCoins}
                   className="bg-green-500 text-white px-3 py-1 rounded-r"
@@ -100,7 +132,7 @@ const Panier = () => {
                 </small>
               </p>
               <Link
-                to={"/checkout"}
+                to={"/checkout?bulletCoins=" + bulletCoins + "&bulletCoinReduction=" + bulletCoinReduction + "&finalTotal=" + finalTotal}
                 className="text-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 flex justify-center ">
                 ALLER SUR LA PAGE DE PAIEMENT
               </Link>

@@ -3,9 +3,11 @@ import Navbar from './components/AdminNavbar';
 
 const AdminLayout = ({ children }) => {
     return (
-        <div className="flex h-screen">
-            <Navbar />
-            <div className="flex-1 p-4">
+        <div className="flex h-screen justify-between">
+            <div className={'mr-48'}>
+                    <Navbar />
+            </div>
+            <div className="w-full">
                 <main>{children}</main>
             </div>
         </div>

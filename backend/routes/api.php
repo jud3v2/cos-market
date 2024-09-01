@@ -19,6 +19,7 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\SteamAuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\AdressBookController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\VerifyUser;
 
@@ -55,9 +56,11 @@ Route::middleware('user')->group(function () {
     Route::resource('music-kit', MusicKitsController::class)->except(['create', 'edit']);
     Route::resource('patches', PatchesController::class)->except(['create', 'edit']);
     Route::resource('stickers', StickersController::class)->except(['create', 'edit']);
-    Route::resource('bulletcoin', BulletCoinController::class)->except(['create', 'edit', 'index', 'destroy']);
+    Route::resource('bulletcoin', BulletCoinController::class)->except(['create', 'edit', 'destroy']);
     Route::resource('transaction', TransactionController::class)->except(['create', 'edit', 'update', 'destroy']);
     Route::resource('order', OrderController::class)->except(['create', 'edit']);
+    Route::resource('adress-book', AdressBookController::class)->except(['create', 'edit']);
+    Route::resource('address-book', AdressBookController::class)->except(['create', 'edit']);
     Route::get('/user/orders', [OrderController::class, 'getOrders']);
     Route::get('/transaction/{id}/last', [TransactionController::class, 'getLastTransaction']);
     Route::post('/sync/game/{id}', [BulletCoinController::class, 'syncGameAttempts']);
@@ -65,10 +68,12 @@ Route::middleware('user')->group(function () {
     Route::get('/steam/inventory', [SteamAuthController::class, 'getInventory'])->name('steam.inventory');
     Route::post('/payment/success/{id}/success', [PaymentController::class, 'confirmPayment'])->name('payment.confirm');
     Route::get('inventory', [OrderController::class, 'getInventory'])->name('user.inventory');
+    Route::get('bc/transactions', [BulletCoinController::class, 'getTransaction'])->name('user.transactions');
 });
 
 // ROUTES AVEC AUTHENTIFICATION ADMIN
 Route::middleware('admin')->group(function () {
     Route::get('/admin/users', [AdminAuthController::class, 'getAllUsers']);
     Route::get('/admin/users/{id}/orders', [OrderController::class, 'getOrdersForUser']);
+    Route::get('/admin/products', [ProductController::class, 'getProductsAdmin']);
 });

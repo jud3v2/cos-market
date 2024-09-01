@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\UnblockProductJob;
 use App\Models\Product;
 use App\Models\Skin;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         if(isset($_GET['limit']) && isset($_GET['page'])) {
             $limit = $_GET['limit'];
@@ -40,8 +41,23 @@ class ProductController extends Controller
             ]);
         }
 
-        // Get all products where is not blocked by a user
-        $products = Product::where('blocked_at', null)->get();
+
+        $products = Product::where('blocked_at', "=", null)->where( "paid", "=", false)->where('isActive', true)->get();
+
+
+        foreach ($products as $product) {
+            $product[$product->type] = $product->getRelatedItem();
+        }
+
+        return response()->json([
+            'products' => $products,
+            'success' => true,
+        ]);
+    }
+
+    public function getProductsAdmin(): JsonResponse
+    {
+        $products = Product::all();
 
         foreach ($products as $product) {
             $product[$product->type] = $product->getRelatedItem();

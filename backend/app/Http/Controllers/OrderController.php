@@ -29,12 +29,23 @@ class OrderController extends Controller
     {
         $request->validate([
             'user_id' => 'required',
+            'address_id' => 'required',
+            'bcreduction' => 'nullable'
         ]);
 
         $user = User::find($request->user_id);
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
+        }
+
+        if($request->bcreduction) {
+            // check balance of user in bulletCoin table if the request bc is greater than balance use only the balance
+            $balance = $user->bulletCoin->amount;
+
+            if($request->bcreduction > $balance) {
+                $request->bcreduction = $balance;
+            }
         }
 
         $products = (new Cart($user->steam_id))->getProducts();
@@ -87,11 +98,19 @@ class OrderController extends Controller
             return response()->json(['error' => 'Votre panier ne dispose de plus aucun produit'], 404);
         }
 
+        // if bcreduction is greater than 0, we will use it to reduce the total price by 0.01%
+        if($request->bcreduction > 0) {
+            $bulletCoinValue = 0.0001; // 0.01%
+            $reduction = $request->total_price_with_tax * ($bulletCoinValue * $request->bcreduction);
+            $request->total_price_with_tax -= $reduction;
+        }
+
         // création de la commande
         $order = new Order();
         $order->total_price = $request->total_price;
         $order->total_price_with_tax = $request->total_price_with_tax;
         $order->user_id = $user->id;
+        $order->client_address = $request->address_id;
         $order->save();
 
         // si la commande n'a pas été créer on vas retourner une erreur
@@ -227,14 +246,17 @@ class OrderController extends Controller
 
         // Filter paid products
         $paidProducts = $products->filter(function ($product) {
-            // Debugging: Inspect each product's is_paid status
-            Log::info('Product ID: ' . $product->id . ' - is_paid: ' . $product->paid);
             return $product->paid;
         });
 
         // Debugging: Check if any paid products were found
         if ($paidProducts->isEmpty()) {
             return response()->json(['message' => 'No paid products found'], 404);
+        }
+
+        foreach ($paidProducts as $product) {
+            $type = $product->type;
+            $product->$type = $product->getRelatedItem();
         }
 
         // Convert to array and return as JSON
