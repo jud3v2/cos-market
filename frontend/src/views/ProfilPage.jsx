@@ -3,8 +3,11 @@ import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
 import config from "../config/index.js";
 import dayjs from "dayjs";
+
 const ProfilePage = () => {
     const [userProfile, setUserProfile] = useState(null);
+    const [inventory, setInventory] = useState([]);
+    const [skins, setSkins] = useState([]);
     const [bulletCoin, setBulletCoin] = useState(null);
     const [error, setError] = useState(null);
     const [isAddressBookLoading, setIsAddressBookLoading] = useState(true);
@@ -44,6 +47,30 @@ const ProfilePage = () => {
             }
         };
 
+        const fetchInventory = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get('http://localhost:8000/api/inventory', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                setInventory(response.data.products || []);
+            } catch (err) {
+                setError(err.message);
+            }
+        };
+
+        const fetchSkins = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/api/skin');
+                setSkins(response.data);
+            } catch (err) {
+                setError(err.message);
+            }
+        };
+
         const fetchAddressBook = async () => {
             try {
                 const token = localStorage.getItem('token');
@@ -52,8 +79,8 @@ const ProfilePage = () => {
                         Authorization: `Bearer ${token}`
                     }
                 }).finally(() => {
-                        setIsAddressBookLoading(false)
-                    })
+                    setIsAddressBookLoading(false)
+                });
 
                 setAddressBook(response.data);
             } catch (err) {
@@ -84,10 +111,18 @@ const ProfilePage = () => {
         }
 
         fetchUserProfile();
+        fetchInventory();
+        fetchSkins();
         fetchAddressBook();
         fetchBulletCoin();
         fetchBCTransaction();
     }, []);
+
+    // Fonction pour trouver l'image en comparant les noms
+    const getImageForProduct = (productName) => {
+        const matchedSkin = skins.find(skin => skin.name === productName);
+        return matchedSkin ? matchedSkin.image : 'https://path-to-placeholder-image.com/default.png';
+    };
 
     const handleAddAddress = async () => {
         setIsAdding(true);
@@ -159,7 +194,7 @@ const ProfilePage = () => {
         } catch (err) {
             setError(err.message);
         } finally {
-            setIsEditing(false);  
+            setIsEditing(false);
         }
     };
 
@@ -170,12 +205,15 @@ const ProfilePage = () => {
 
     if (error) return <p>Error: {error}</p>;
 
+    console.log(inventory);
+
     return (
-        <div className="flex items-start justify-center min-h-screen bg-gray-100 p-6">
+        <div className="flex items-start justify-center min-h-screen bg-gray-100 p-6 gap-8">
             {userProfile ? (
                 <>
                     {/* Colonne Profil */}
-                    <div className="w-1/3 bg-white p-6 rounded-lg shadow-lg mr-6">
+                    <div className='flex flex-col'>
+                    <div className="w-full max-w-full bg-white p-6 rounded-lg shadow-lg mr-6">
                         <img src={userProfile.avatar} alt="Steam Avatar" className="rounded-full mb-4"
                             style={{ width: '150px', height: '150px' }} />
                         <h2 className="text-2xl font-bold mb-2">{userProfile.profile_name}</h2>
@@ -192,6 +230,29 @@ const ProfilePage = () => {
                                 Voir mon profil Steam
                             </button>
                         </a>
+                    </div>
+                    <div className={'w-full max-w-full'}>
+                        {/* Section Inventaire */}
+                        <div className="w-full bg-white p-6 rounded-lg shadow-lg mt-3">
+                                <h3 className="text-xl font-bold mb-4">Votre Inventaire :</h3>
+                                {inventory.length > 0 ? (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                        {inventory.map(product => (
+                                            <div key={product.id} className="flex flex-col items-center">
+                                                <img
+                                                    src={getImageForProduct(product.name)}
+                                                    alt={product.name}
+                                                    className="w-24 h-24 object-fit"
+                                                />
+                                                <p className="text-sm text-center">{product.name}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-600">Aucun produit dans votre inventaire.</p>
+                                )}
+                            </div>
+                    </div>
                     </div>
 
                     <div className={'w-full max-w-full'}>
