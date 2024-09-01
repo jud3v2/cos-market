@@ -58,7 +58,7 @@ const ProfilePage = () => {
 
                 setInventory(response.data.products || []);
             } catch (err) {
-                setError(err.message);
+                setInventory([]);
             }
         };
 
@@ -67,7 +67,7 @@ const ProfilePage = () => {
                 const response = await axios.get('http://localhost:8000/api/skin');
                 setSkins(response.data);
             } catch (err) {
-                setError(err.message);
+                setSkins([]);
             }
         };
 
@@ -84,7 +84,7 @@ const ProfilePage = () => {
 
                 setAddressBook(response.data);
             } catch (err) {
-                setError(err.message);
+                setAddressBook([]);
             }
         };
 
