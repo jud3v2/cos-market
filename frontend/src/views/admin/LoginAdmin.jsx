@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import config from '../../config';
 const LoginAdmin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

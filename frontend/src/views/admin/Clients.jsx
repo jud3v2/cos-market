@@ -4,7 +4,7 @@ import { Box, Button, Modal, Typography, Table, TableBody, TableCell, TableConta
 import { Edit, Delete, Visibility } from '@mui/icons-material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-
+import config from '../../config';
 const style = {
   position: 'absolute',
   top: '50%',

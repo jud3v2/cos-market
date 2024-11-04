@@ -1,5 +1,5 @@
 import { getSteamId } from '../utils/getSteamId';
-
+import config from '../config';
 class CartService {
   constructor() {
     this.cartKey = 'cart';
