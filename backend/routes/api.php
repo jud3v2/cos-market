@@ -71,6 +71,9 @@ Route::middleware('user')->group(function () {
     Route::get('bc/transactions', [BulletCoinController::class, 'getTransaction'])->name('user.transactions');
 });
 
+// register user
+Route::post('/register', [AuthController::class, 'register']);
+
 // ROUTES AVEC AUTHENTIFICATION ADMIN
 Route::middleware('admin')->group(function () {
     Route::get('/admin/users', [AdminAuthController::class, 'getAllUsers']);
