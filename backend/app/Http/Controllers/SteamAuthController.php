@@ -69,7 +69,7 @@ class SteamAuthController extends Controller
                 }
 
                 $token = JWTAuth::fromUser($user);
-                return redirect()->away('http://localhost:5173/steam/login?token=' . $token);
+                return redirect()->away('https://cos-market-frontend.jud3v.fr/steam/login?token=' . $token);
             }
         }
         return redirect('/')->with('error', 'Authentication failed.');

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loading from "../components/Loading.jsx";
+import config from '../config';
 
 const SteamLoginSuccess = () => {
     const location = useLocation();
@@ -15,7 +16,7 @@ const SteamLoginSuccess = () => {
             localStorage.setItem('token', token);
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            axios.get('http://localhost:8000/api/user')
+            axios.get(`${config.backendUrl}/user`)
                 .then(response => {
                     setUser(response.data);
                 })

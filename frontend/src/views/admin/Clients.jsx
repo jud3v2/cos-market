@@ -33,7 +33,7 @@ const Clients = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/admin/users');
+        const response = await axios.get(`${config.backendUrl}/admin/users`);
         if (response.data.success) {
           setUsers(response.data.users);
         } else {
@@ -51,7 +51,7 @@ const Clients = () => {
 
   const fetchOrders = async (id, name) => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/admin/users/${id}/orders`);
+      const response = await axios.get(`${config.backendUrl}/admin/users/${id}/orders`);
       if (response.data.orders) {
         setOrders(response.data.orders);
         setSelectedUser(id);

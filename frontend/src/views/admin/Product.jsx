@@ -5,7 +5,7 @@ import { Box, Button, TextField, Typography, Table, TableBody, TableCell, TableC
 import { Delete, Edit, Info } from '@mui/icons-material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-
+import config from '../../config';
 const style = {
   position: 'absolute',
   top: '50%',
@@ -53,7 +53,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/admin/products');
+      const response = await axios.get(`${config.backendUrl}/admin/products`);
       if (response.data.success) {
         setProducts(response.data.products);
       } else {
@@ -69,7 +69,7 @@ const Products = () => {
   const fetchSkins = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8000/api/skin', {
+      const response = await axios.get(`${config.backendUrl}/skin`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -83,7 +83,7 @@ const Products = () => {
 
   const handleAddProduct = async () => {
     try {
-      const response = await axios.post('http://localhost:8000/api/product', newProduct);
+      const response = await axios.post(`${config.backendUrl}/product`, newProduct);
       setProducts([...products, response.data]);
       setSnackbar({ open: true, message: 'Produit ajouté avec succès', severity: 'success' });
       closeAddModal();
@@ -95,7 +95,7 @@ const Products = () => {
 
   const handleEditProduct = async () => {
     try {
-      const response = await axios.put(`http://localhost:8000/api/product/${selectedProduct.id}`, {
+      const response = await axios.put(`${config.backendUrl}/product/${selectedProduct.id}`, {
         ...selectedProduct,
         price: editProduct.price,
         usage: editProduct.usage
@@ -111,7 +111,7 @@ const Products = () => {
 
   const handleDeleteProduct = async () => {
     try {
-      await axios.delete(`http://localhost:8000/api/product/${selectedProduct.id}`);
+      await axios.delete(`${config.backendUrl}/product/${selectedProduct.id}`);
       setProducts(products.filter(prod => prod.id !== selectedProduct.id));
       setSnackbar({ open: true, message: 'Produit supprimé avec succès', severity: 'success' });
       closeDeleteModal();

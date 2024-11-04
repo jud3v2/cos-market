@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ProductCard from '../components/ProductCard';
 import Dropdown from '../components/Dropdown';
 import Loading from "../components/Loading.jsx";
+import config from '../config';
 import '../index.css';
 
 const Products = () => {
@@ -36,7 +37,7 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/product');
+        const response = await fetch(`${config.backendUrl}/api/product`);
         if (!response.ok) throw new Error('Network response was not ok');
 
         const data = await response.json();

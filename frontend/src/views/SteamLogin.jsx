@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import config from '../config';
 
 const SteamLogin = () => {
     const location = useLocation();
@@ -23,7 +24,7 @@ const SteamLogin = () => {
 
     const handleLogin = () => {
         console.log('Redirecting to Steam login');
-        window.location.href = 'http://localhost:8000/api/steam/login';
+        window.location.href = `${config.backendUrl}/steam/login`;
     };
 
     return (

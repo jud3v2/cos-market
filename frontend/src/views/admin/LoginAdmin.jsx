@@ -21,8 +21,8 @@ const LoginAdmin = () => {
         setMessage('');
 
         try {
-            const response = await axios.post('http://localhost:8000/api/admin/login', {
-                email,
+            const response = await axios.post(`${config.backendUrl}/admin/login`, {
+            email,
                 password,
             });
             setMessage(response.data.message);

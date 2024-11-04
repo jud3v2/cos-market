@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import { store } from './store/gameStore.js'
+import config from './config/index.js'
 import { Provider } from "react-redux";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -13,7 +14,7 @@ dayjs.extend(localizedFormat);
 dayjs.extend(relativeTime);
 dayjs.locale('fr');
 
-axios.defaults.baseURL = "http://localhost:8000/api";
+axios.defaults.baseURL = config.backendUrl;
 
 axios.interceptors.request.use(function (config) {
   const token = localStorage.getItem('token');

@@ -45,7 +45,7 @@ class CartService {
   async saveCartToDB(productId) {
     const steamId = getSteamId();
     console.log('Données envoyées à l\'API:', { steam_id: steamId, productId });
-    const response = await fetch(`http://localhost:8000/api/cart/0`, {
+    const response = await fetch(`${config.backendUrl}/cart/0`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ class CartService {
   }
 
   async removeItem(produitId) {
-    const response = await fetch(`http://localhost:8000/api/cart-remove?product_id=${produitId}&steam_id=${getSteamId()}`, {
+    const response = await fetch(`${config.backendUrl}/cart-remove?product_id=${produitId}&steam_id=${getSteamId()}`, {
       method: 'GET',
     });
 

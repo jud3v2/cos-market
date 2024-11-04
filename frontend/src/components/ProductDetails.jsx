@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import AddToCartButton from './AddToCartButton';
 import {jwtDecode} from "jwt-decode";
+import config from '../config';
 
 const ProductDetail = (props) => {
   const { id } = useParams();
@@ -41,7 +42,8 @@ const ProductDetail = (props) => {
 
   const fetchProduct = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/product/${id}`);
+
+      const response = await fetch(`${config.backendUrl}/product/${id}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }

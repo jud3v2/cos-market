@@ -36,7 +36,7 @@ const ProfilePage = () => {
             try {
                 const token = localStorage.getItem('token');
                 const user = jwtDecode(token);
-                const response = await axios.get(`http://localhost:8000/api/user-profile/${user.sub}`, {
+                const response = await axios.get(`${config.backendUrl}/user-profile/${user.sub}`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -51,7 +51,7 @@ const ProfilePage = () => {
         const fetchInventory = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:8000/api/inventory', {
+                const response = await axios.get(`${config.backendUrl}/inventory`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -68,7 +68,7 @@ const ProfilePage = () => {
 
         const fetchSkins = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/api/skin');
+                const response = await axios.get(`${config.backendUrl}/skin`);
                 setSkins(response.data);
             } catch (err) {
                 setSkins([]);
@@ -78,7 +78,7 @@ const ProfilePage = () => {
         const fetchAddressBook = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:8000/api/adress-book', {
+                const response = await axios.get(`${config.backendUrl}/adress-book`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -132,7 +132,7 @@ const ProfilePage = () => {
         setIsAdding(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post('http://localhost:8000/api/adress-book', newAddress, {
+            const response = await axios.post(`${config.backendUrl}/adress-book`, newAddress, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -166,7 +166,7 @@ const ProfilePage = () => {
         setIsDeleting(id);
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:8000/api/adress-book/${id}`, {
+            await axios.delete(`${config.backendUrl}/adress-book/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -183,7 +183,7 @@ const ProfilePage = () => {
         setIsEditing(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.put(`http://localhost:8000/api/adress-book/${id}`, editAddress, {
+            const response = await axios.put(`${config.backendUrl}/adress-book/${id}`, editAddress, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
